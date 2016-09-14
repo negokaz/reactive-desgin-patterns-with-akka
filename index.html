@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Lagom で学ぶ Reactive Microservices Architecture</title>
+  <meta charset="utf-8">
+  <link rel="shortcut icon" href="r/favicon.ico">
+  <link rel="stylesheet" type="text/css" href="r/light-theme/light-theme.css" />
+  <link rel="stylesheet" type="text/css" href="r/tis-theme/tis-theme.css" />
+</head>
+<body>
+
+<!-------------↓ slide content (markdown) ↓------------><textarea id="source">
+layout: true
+
+.footer[
+.copyright[© 2016 TIS Inc.]
+]
+
+---
+class: center, middle
+background-image: url("r/img/title-background.jpg")
+
+.glass[
+# Lagom で学ぶ<br>Reactive<br>Microservices Architecture
+]
+
+???
+
+近年、マイクロサービスアーキテクチャに注目が集まっています。
+そのような状況の中、米Lightbend社からマイクロサービスアーキテクチャ向けフレームワークの Lagom がリリースされました。
+Lagom は Reactive Manifesto で提唱されている Reactiveness を持つマイクロサービスの開発をサポートする、
+設計思想と機能を備えています。
+Reactiveness はシステムが大規模になるほど重要になってきます。
+この講演では Lagom の特徴的な設計思想や機能を取り上げ、
+マイクロサービスアーキテクチャを採用した大規模なシステムがとるべき振る舞いと、
+それが Lagom でどのように実現されているのかを解説します。
+
+---
+
+## 私は何者？
+
+* 根来 和輝 .small[Negoro Kazuki]
+* TIS株式会社 生産技術R＆D室
+* Reactive System に関する技術検証・コンサル
+    * Lightbend Reactive Platform
+        * Scala / Akka / Play framework
+
+.with-twitter-icon[[@negokaz](https://twitter.com/negokaz)] .with-github-icon[[negokaz](https://github.com/negokaz)]
+
+???
+
+私たちは Reactive System の推進をミッションとしていて、Lightbend Reactive Platform つまり
+Scala や Akka、Play といった技術の検証やコンサルを おこなっています。
+
+---
+
+## 今日話したいこと
+
+* Microservices の開発に役立つかもしれない <br> Lagom のアーキテクチャについて
+* コードはあまり出てきません
+
+---
+
+## Lagom とは？
+
+.height-3.center[![](r/img/lagom_logo.svg)]
+
+* Lightbend社が3月にリリースしたMSA向けフレームワーク
+* 内部 API は Java
+* コンセプトは **.strong[Reactive] Microservices Architecture**
+
+.footnote[
+[https://www.lightbend.com/lagom](https://www.lightbend.com/lagom)
+
+[Reactive Microservices Architecture (O’Reilly)](http://www.oreilly.com/programming/free/reactive-microservices-architecture.html)
+]
+
+---
+
+## Microservices Architecture？
+
+* 2014年3月に ThoughtWorks社 の Martin Fowler によって提唱された
+* 小さいサービスを組み合わせて 一つのアプリケーションを構築するスタイルのこと
+* システムを分割することにより .strong[様々な利点]が得られる
+* (長いので以降は**MSA**と略します)
+
+---
+
+## MSAのメリット
+
+* 異なるチームで独立して開発できる
+    * コミュニケーションコストを抑えることができる
+* サービスごとに異なる技術が使える
+    * サービスの特性に合った技術を採用できる
+* デプロイの影響範囲を小さくできる
+    * 新機能や修正を早くリリースできる
+* 障害を一部のサービスに留めることができる
+    * 全体の可用性を高めることができる
+
+???
+
+* コミュニケーションのコストは n^2 のオーダーで増加する (by ブルックスの法則)
+
+---
+
+## MSAのデメリット
+
+分散システムであることにより…
+
+* システムの複雑さが増す
+* 障害点が増える
+    * 特にネットワーク
+* オーバーヘッドが増える
+
+--
+
+.with-arrow[このデメリットを最小化したい]
+
+---
+
+## そういうときの Lagom です
+
+* Lagom は Reactive な Microservices を目指すフレームワーク
+* Reactive を達成するための様々な道具を備えている
+
+これらの道具を用いることで
+
+* 高い可用性
+* 高いスケーラビリティ
+
+を実現することができるようになっている
+
+---
+
+## Reactive のおさらい
+
+.center[
+<iframe src="https://www.slideshare.net/slideshow/embed_code/key/bpqBuXOj1fENSp?startSlide=29" width="577" height="470" frameborder="1" marginwidth="0" marginheight="0" scrolling="no"></iframe>
+]
+
+.footnote[
+[リアクティブ・アーキテクチャ ～大規模サービスにおける必要性と課題〜](http://www.slideshare.net/okapies/reactive-architecture-20160218-58403521)
+]
+
+???
+
+リアクティブな性質を持たせることで、これらの問題を軽減
+
+---
+
+## Lagom が Reactive を達成する道具
+
+* 非同期/ノンブロッキングなAPI
+* Sharding によるステートフルなアーキテクチャ
+* 分散型の永続化機構
+  * Event Sourcing + CQRS
+* CircuitBreaker
+
+---
+class: center, middle
+
+## 非同期/ノンブロッキングなAPI
+
+---
+
+## なぜ必要か？
+
+* レイテンシを小さくする
+* 外部サービスの障害時に影響を受けにくくする
+
+---
+
+## 同期的にAPIを呼び出す
+
+* 応答に100msかかるAPIを5つ呼び出すと...
+
+.center[
+.width-25[![](r/img/api-call.blocking.svg)]
+]
+
+---
+
+## 非同期にAPIを呼び出す
+
+* 応答に100msかかるAPIを5つ呼び出すと...
+
+.center[
+.width-25[![](r/img/api-call.non-blocking.svg)]
+]
+
+--
+
+.float-bottom-10[
+.with-arrow[1/5 の時間で応答を返せる！]
+]
+
+---
+
+## ブロックしてタスクを実行する
+
+* 待っている間もスレッドを専有する
+
+.center[
+.width-22[![](r/img/thread.blocking.svg)]
+]
+
+---
+
+## ノンブロッキングでタスクを実行する
+
+* 待っている間は別のタスクを処理できる
+
+.center[
+.width-22[![](r/img/thread.non-blocking.svg)]
+]
+
+---
+
+## ブロックしてタスクを実行する
+
+* 相手が応答しないとき大量のスレッドを消費する
+
+.center[
+.width-22[![](r/img/thread.fail-blocking.1.svg)]
+]
+
+---
+
+## ブロックしてタスクを実行する
+
+* 相手が応答しないとき大量のスレッドを消費する
+
+.center[
+.width-22[![](r/img/thread.fail-blocking.2.svg)]
+]
+
+---
+
+## ノンブロッキングでタスクを実行する
+
+* 相手が応答しなくてもスレッドの消費を抑えられる
+
+.center[
+.width-22[![](r/img/thread.fail-non-blocking.svg)]
+]
+
+
+---
+
+## コードの複雑さ
+
+* 同期/ブロッキング API
+
+```java
+Response a = serviceA.request();
+Response b = serviceA.request();
+
+Integer responseSize = a.size + b.size;
+doSomething(responseSize);
+```
+
+* 非同期/ノンブロッキング API
+
+```java
+CompletionStage<Response> a = serviceA.request();
+CompletionStage<Response> b = serviceA.request();
+
+CompletionStage<Integer> responseSize =
+  a.thenCombine(b, (resA, resB) -> resA + resB));
+responseSize.thenAccept(size -> doSomething(size));
+```
+
+.footnote[
+[Java SE 8 API - CompletionStage&amp;lt;T&amp;gt;](https://docs.oracle.com/javase/jp/8/docs/api/java/util/concurrent/CompletionStage.html)
+]
+
+---
+
+## Lagom では
+
+* 外部サービスの呼び出しやDBの操作をするようなAPIは 全て非同期/ノンブロッキング
+
+---
+class: center, middle
+
+## Sharding による<br>ステートフルなアーキテクチャ
+
+---
+
+## Sharding？
+
+* 負荷分散の手法の一つ
+* 単一障害点がないため高い可用性を実現できる
+* Lagomでは単体のサービスをスケールするのに利用される
+
+???
+
+`shardId = (math.abs(entityId.hashCode) % maxNumberOfShards)`
+
+---
+
+## ステートフルな Entity
+
+* Lagom では Entity がオンメモリで状態を持つ
+* 状態は DB にバックアップされる
+* 状態を DB に問い合わせる必要がない
+    * レイテンシを抑えられる
+* Entity には位置透過性があり、ノード間を移動できる
+    * ノードやネットワークに障害があっても復旧できる
+
+---
+
+## 例えば？
+
+.float-top-15.height-19.glass[
+* Lagom の公式サンプルアプリ [Chirper](https://github.com/lagom/activator-lagom-java-chirper) では<br>FriendEntity が実装されている
+* FriendEntity
+    * User ID ごとに作られる
+    * ユーザー名、フォローしているユーザーのリストを持つ
+]
+
+.right[
+<br>
+<br>
+<br>
+<br>
+<br>
+.height-10[![](r/img/jinmyaku.png)]
+]
+
+---
+
+## Sharding？
+
+.float-top-15[
+* Entity は Shard というグループに分けられる
+]
+
+.height-18[![](r/img/sharding-architecture.2.svg)]
+
+---
+
+## Sharding？
+
+.float-top-15[
+* Shard は Node(サーバ) に配置される
+]
+
+.height-18[![](r/img/sharding-architecture.3.svg)]
+
+---
+
+## Sharding？
+
+.float-top-15[
+* Node に障害が起きたら
+]
+
+.height-18[![](r/img/sharding-architecture.4.svg)]
+
+---
+
+## Sharding？
+
+.float-top-15[
+* 別のノードに Shard が移動 (復元) する
+]
+
+.height-18[![](r/img/sharding-architecture.5.svg)]
+
+---
+
+## Sharding？
+
+.float-top-15[
+* 新しいノードを追加すると
+]
+
+.height-18[![](r/img/sharding-architecture.6.svg)]
+
+---
+
+## Sharding？
+
+.float-top-15[
+* シャードが分散(リバランス)され、元の状態に戻る
+]
+
+.height-18[![](r/img/sharding-architecture.7.svg)]
+
+---
+
+## Lagom では
+
+この仕組みは Lagom によって提供される
+
+--
+
+.with-arrow[私たちは Entity の実装に集中できる]
+
+---
+class: middle, center
+
+## 分散型の永続化機構
+
+---
+
+## 分散型の永続化機構
+
+.strong[Event Sourcing] と .strong[CQRS] による永続化のしくみを 備えており、データの読み込みと書き込みの両方を スケールできるようになっている
+
+---
+
+## Event Sourcing？
+
+* システムの中で起きた**イベント**を永続化する
+* イベントをデータストアに INSERT していく
+* イベントは不変(immutable)
+    * ロック不要・復数のノードに分散して書き込める
+        * 書き込みをスケールしやすい
+    * キャッシュ・コピー・共有が容易
+        * 読み込みをスケールしやすい
+        * データの耐久性を高くできる
+* Lagom では Entity の状態を永続化するのに使う
+
+---
+
+## Event Sourcing？
+
+* システムの中で起きた**イベント**を永続化する
+
+.as-underlay[
+.height-14[![](r/img/event-sourcing.1.svg)]
+]
+
+--
+
+.as-underlay[
+.height-14[![](r/img/event-sourcing.2.svg)]
+]
+
+--
+
+.as-underlay[
+.height-14[![](r/img/event-sourcing.3.svg)]
+]
+
+--
+
+.as-underlay[
+.height-14[![](r/img/event-sourcing.4.svg)]
+]
+
+--
+
+.as-underlay[
+.height-14[![](r/img/event-sourcing.5.svg)]
+]
+
+---
+
+## Event Sourcing？
+
+* Entity の状態が失われた場合は、<br>イベントを **.accent[再生]** して状態を復元する
+* デメリット
+  * データの集計にコストがかかる
+.with-arrow[CQRSで解決できる]
+
+---
+
+## CQRS？
+
+* .bold[C]ommand and .bold[Q]uery .bold[R]esponsibility .bold[S]egregation
+    コマンドクエリ責務分離
+* コマンド(書き込み)とクエリ(読み込み)を分離する
+* 書き込み側と読み込み側で
+    * 異なるDB・データ構造が使える
+    * 別々にスケールできるようになる
+.with-arrow[Command-Side にイベントソーシングを使い<br>Query-Side に集計しやすい形で永続化する]
+
+---
+
+## CQRS？
+
+.center[
+.height-16[![](r/img/es-and-cqrs.svg)]
+]
+
+---
+
+## CQRS？
+
+* デメリット
+    * 書き込み・読み込みで完全な一貫性を保てなくなる
+      * 十分な時間が経つと整合性がとれる (結果整合性)
+.with-arrow[一時的に一貫性が取れてなくても問題ないよう ビジネスやシステムを設計する]
+* Lagom では Entity をまたがる集計などを行うのに使う
+    * 例) フォロー **されている** ユーザーの一覧
+
+---
+exclude: true
+
+## デモ？
+
+---
+exclude: true
+
+## ReadSide への遅延の理由
+
+* Timestamp ベースでイベントの順序を決める
+* EventProcessor が参照するDBにイベントが反映されるタイミングがまばら
+* 全イベントを拾えるようにあえて遅延させている
+* `cassandra-query-journal.eventual-consistency-delay = 10s`
+* とは言いつつ全イベントが拾えることを保証するものではない
+  * ネットワーク障害
+
+---
+class: center, middle
+
+## CircuitBreaker
+
+---
+
+## CircuitBreaker とは？
+
+.small[
+* 外部サービスに障害が起きているとき、すぐエラーの応答を返す仕組み
+    * 障害時のリトライによるネットワーク帯域の無駄遣いが減る
+    * レイテンシを低く抑えられる
+* Close・Open・Half-Open の状態をとる
+]
+
+.center.height-6[
+![](http://www.lagomframework.com/documentation/1.2.x/java/resources/guide/services/circuit-breaker-states.png)
+]
+
+.footnote[
+引用: [Lagom #Consuming services](http://www.lagomframework.com/documentation/1.2.x/java/ServiceClients.html#Circuit-Breakers)
+]
+
+---
+
+## Open？ Close？
+
+* CircuitBreaker はもともと電子工学の言葉
+* 電流が流れすぎているときに電流を遮断する保護回路
+
+.center.height-6[
+![](r/img/cb-open-close.svg)
+]
+
+* **Close**: 回路が**閉じた**状態 = 通信できる
+* **Open**: 回路が**開いた**状態 = 通信が遮断されている
+
+---
+
+## CircuitBreaker のしくみ
+
+.center.height-6[
+![](http://www.lagomframework.com/documentation/1.2.x/java/resources/guide/services/circuit-breaker-states.png)
+]
+
+.small[
+* **Close**: 外部サービスへリクエストする
+* **Open**: すぐにエラーを返す
+* **Half-Open**: リクエストを試す
+    * Open から一定時間で切り替わる
+    * リクエストが成功したら Close に戻る
+]
+
+.footnote[
+引用: [Lagom #Consuming services](http://www.lagomframework.com/documentation/1.2.x/java/ServiceClients.html#Circuit-Breakers)
+]
+
+---
+
+## Lagom では
+
+* 外部へのリクエストは全て CircitBreaker を通じて行う
+
+.center[
+![](r/img/cb-call.svg)
+]
+
+---
+
+## まとめ
+
+* 高い可用性
+    * 他のサービスの障害に影響を受けないように
+        * 非同期/ノンブロッキングAPI
+        * CircuitBreaker
+    * 障害から復旧できるように
+        * Sharding
+* 高いスケーラビリティ
+    * 非同期/ノンブロッキングAPI
+    * Sharding
+    * ES + CQRS
+
+---
+
+## Lagom は使いものになるのか？(私見)
+
+* Javaのフレームワークとしては導入障壁は高い
+    * 実績
+        * 導入事例がまだ出てきていない
+        * バグを踏む可能性が高い
+    * 実装の難しさ
+        * 非同期や関数型のプログラミングパラダイム
+
+--
+
+* ただし、Reactive な設計の参考にはなる
+
+---
+class: center, middle
+
+# 質問ありますか？
+
+</textarea><!-----------------↑ slide content (markdown) ↑------------------->
+
+  <script src="r/remark-0.14.0.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+  <script>
+    remark.create({
+      highlightStyle: 'monokai',
+      highlightLines: true,
+      highlightSpans: true
+    });
+    // 全てのリンクが別のタブで開くようにする
+    $('a').attr({target: "_blank"});
+  </script>
+</body>
+</html>

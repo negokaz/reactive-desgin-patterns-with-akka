@@ -1,0 +1,91 @@
+
+.left-column {
+  width: 49%;
+  float: left;
+}
+
+.right-column {
+  width: 49%;
+  float: right;
+}
+
+.background-cover {
+
+  &.remark-slide-content {
+    background-position: center !important;
+    background-size: cover !important;
+  }
+}
+
+.as-underlay {
+  position: absolute;
+
+  > * {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+}
+
+.fit {
+
+  &.remark-slide-content {
+    padding: 0;
+  }
+}
+
+.fit-left {
+
+  &.remark-slide-content {
+    padding: 10px 60px 10px 0;
+  }
+
+  &.remark-slide-content > * {
+    padding: 0 0 0 40px;
+  }
+}
+
+.fit-right {
+
+  &.remark-slide-content {
+    padding: 10px 0 10px 60px;
+  }
+
+  &.remark-slide-content > * {
+    padding: 0 40px 0 0;
+  }
+}
+
+.float-top-loop(100);
+.float-top-loop(@i) when (@i > -1) {
+  .float-top-loop((@i - 1));    // next iteration
+  .float-top-@{i} {
+    .float-top(1% * @i);
+  }
+}
+
+.float-bottom-loop(100);
+.float-bottom-loop(@i) when (@i > -1) {
+  .float-bottom-loop((@i - 1));    // next iteration
+  .float-bottom-@{i} {
+    .float-bottom(1% * @i);
+  }
+}
+
+.footnote {
+  width: 85%;
+  position: absolute;
+  bottom: 1.5rem;
+  text-align: right;
+  font-size: 0.6rem;
+
+  p {
+    margin-top: 0.2rem;
+    margin-bottom: 0.2rem;
+  }
+}
+
+.fill {
+  display: block;
+  object-fit: contain;
+}
