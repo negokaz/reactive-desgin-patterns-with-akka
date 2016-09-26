@@ -441,43 +441,24 @@ body:fullscreen {
   font-weight: bold;
 }
 .bold {
+  color: rgba(0, 0, 0, 0.87);
   font-weight: bold;
 }
-.small {
+*.small {
   /* for inline */
-  font-size: 0.8rem;
+  font-size: 70%;
 }
-.small * {
+*.smaller {
   /* for inline */
-  font-size: 0.8rem;
+  font-size: 50%;
 }
-.small img {
-  max-width: 5rem;
-  max-hegiht: 5rem;
-}
-.smaller {
-  font-size: 0.8em;
-}
-.smaller * {
-  font-size: 0.8em;
-}
-.bigger {
-  font-size: 2em;
-}
-.bigger * {
-  font-size: 2em;
-}
-.big {
+*.bigger {
   /* for inline */
-  font-size: 2rem;
+  font-size: 180%;
 }
-.big * {
+*.big {
   /* for inline */
-  font-size: 2rem;
-}
-.big img {
-  min-width: 40%;
-  min-height: 40%;
+  font-size: 140%;
 }
 .with-code-annotation code {
   padding-top: 1rem !important;
@@ -3851,6 +3832,18 @@ img {
 .accent {
   color: #E91E63;
 }
+.heavy {
+  color: rgba(0, 0, 0, 0.87);
+}
+em {
+  color: rgba(0, 0, 0, 0.87);
+  font-weight: bold;
+  font-style: normal;
+}
+strong {
+  color: #E91E63;
+  font-weight: bold;
+}
 /*
  * ex)
  * <div class="highlight" style="width: 2em; height: 3em; top: 10%; left: 10%;"></div>
@@ -3873,10 +3866,6 @@ h3,
 h4,
 h5,
 h6 {
-  color: rgba(0, 0, 0, 0.87);
-}
-strong,
-em {
   color: rgba(0, 0, 0, 0.87);
 }
 a {

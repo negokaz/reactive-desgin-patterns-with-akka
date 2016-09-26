@@ -18,6 +18,21 @@
   color: #E91E63;
 }
 
+.heavy {
+  color: rgba(0, 0, 0, 0.87);
+}
+
+em {
+  .heavy;
+  font-weight: bold;
+  font-style: normal;
+}
+
+strong {
+  .accent;
+  font-weight: bold;
+}
+
 /*
  * ex)
  * <div class="highlight" style="width: 2em; height: 3em; top: 10%; left: 10%;"></div>
@@ -43,7 +58,6 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 strong, em {
-  color: rgba(0, 0, 0, 0.87);
 }
 
 a {

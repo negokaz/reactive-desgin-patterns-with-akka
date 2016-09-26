@@ -67,7 +67,7 @@ Scala や Akka、Play といった技術の検証やコンサルを おこなっ
 
 * Lightbend社が3月にリリースしたMSA向けフレームワーク
 * 内部 API は Java
-* コンセプトは **.strong[Reactive] Microservices Architecture**
+* コンセプトは **Reactive** *Microservices Architecture*
 
 .footnote[
 [https://www.lightbend.com/lagom](https://www.lightbend.com/lagom)
@@ -82,7 +82,7 @@ Scala や Akka、Play といった技術の検証やコンサルを おこなっ
 * 2014年3月に ThoughtWorks社 の Martin Fowler によって提唱された
 * 小さいサービスを組み合わせて 一つのアプリケーションを構築するスタイルのこと
 * システムを分割することにより .strong[様々な利点]が得られる
-* (長いので以降は**MSA**と略します)
+* (長いので以降は *MSA* と略します)
 
 ---
 
@@ -107,7 +107,7 @@ Scala や Akka、Play といった技術の検証やコンサルを おこなっ
 
 --
 
-* MSAにすると分散システムになる
+* MSAにすると **.big[分散システム]** になる
 
 ---
 
@@ -191,7 +191,7 @@ MSAの開発で汎用的に使えるデザインパターンに近い
 
 ## Lagom が Reactive を達成する道具
 
-* **.with-checkbox-off.accent[非同期/ノンブロッキングなAPI]**
+* **.with-checkbox-off[非同期/ノンブロッキングなAPI]**
 * .with-checkbox-off[Sharding によるステートフルなアーキテクチャ]
 * .with-checkbox-off[分散型の永続化機構]
   * Event Sourcing + CQRS
@@ -327,7 +327,7 @@ responseSize.thenAccept(size -> doSomething(size));
 ## Lagom が Reactive を達成する道具
 
 * .with-checkbox-on[非同期/ノンブロッキングなAPI]
-* **.with-checkbox-off.accent[Sharding によるステートフルなアーキテクチャ]**
+* **.with-checkbox-off[Sharding によるステートフルなアーキテクチャ]**
 * .with-checkbox-off[分散型の永続化機構]
   * Event Sourcing + CQRS
 * .with-checkbox-off[Circuit Breaker]
@@ -451,8 +451,8 @@ responseSize.thenAccept(size -> doSomething(size));
 
 * .with-checkbox-on[非同期/ノンブロッキングなAPI]
 * .with-checkbox-on[Sharding によるステートフルなアーキテクチャ]
-* **.with-checkbox-off.accent[分散型の永続化機構]**
-  * **.accent[Event Sourcing + CQRS]**
+* **.with-checkbox-off[分散型の永続化機構]**
+  * **[Event Sourcing + CQRS]**
 * .with-checkbox-off[Circuit Breaker]
 
 ---
@@ -502,7 +502,7 @@ responseSize.thenAccept(size -> doSomething(size));
 
 ## Event Sourcing？
 
-* Entity の状態が失われた場合は、<br>イベントを **.accent[再生]** して状態を復元する
+* Entity の状態が失われた場合は、<br>イベントを **[再生]** して状態を復元する
 * イベントは不変(immutable)
     * ロック不要・復数のノードに分散して書き込める
         * 書き込みをスケールしやすい
@@ -575,7 +575,7 @@ exclude: true
 * .with-checkbox-on[Sharding によるステートフルなアーキテクチャ]
 * .with-checkbox-on[分散型の永続化機構]
   * Event Sourcing + CQRS
-* **.with-checkbox-off.accent[Circuit Breaker]**
+* **.with-checkbox-off[Circuit Breaker]**
 
 ---
 
