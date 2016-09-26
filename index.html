@@ -284,7 +284,7 @@ class: center, middle
 
 ```java
 Response a = serviceA.request();
-Response b = serviceA.request();
+Response b = serviceB.request();
 
 Integer responseSize = a.size + b.size;
 doSomething(responseSize);
@@ -294,10 +294,10 @@ doSomething(responseSize);
 
 ```java
 CompletionStage<Response> a = serviceA.request();
-CompletionStage<Response> b = serviceA.request();
+CompletionStage<Response> b = serviceB.request();
 
 CompletionStage<Integer> responseSize =
-  a.thenCombine(b, (resA, resB) -> resA + resB));
+  a.thenCombine(b, (resA, resB) -> resA.size + resB.size));
 responseSize.thenAccept(size -> doSomething(size));
 ```
 
