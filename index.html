@@ -452,7 +452,7 @@ class: middle, center
     * キャッシュ・コピー・共有が容易
         * 読み込みをスケールしやすい
         * データの耐久性を高くできる
-* Lagom では Entity の状態を永続化するのに使う
+* Lagom では Entity の状態を復元するのに使う
 
 ---
 
@@ -548,11 +548,11 @@ exclude: true
 ---
 class: center, middle
 
-## CircuitBreaker
+## Circuit Breaker
 
 ---
 
-## CircuitBreaker とは？
+## Circuit Breaker とは？
 
 .small[
 * 外部サービスに障害が起きているとき、すぐエラーの応答を返す仕組み
@@ -573,7 +573,7 @@ class: center, middle
 
 ## Open？ Close？
 
-* CircuitBreaker はもともと電子工学の言葉
+* Circuit Breaker はもともと電子工学の言葉
 * 電流が流れすぎているときに電流を遮断する保護回路
 
 .center.height-6[
@@ -585,7 +585,7 @@ class: center, middle
 
 ---
 
-## CircuitBreaker のしくみ
+## Circuit Breaker のしくみ
 
 .center.height-6[
 ![](http://www.lagomframework.com/documentation/1.2.x/java/resources/guide/services/circuit-breaker-states.png)
@@ -620,7 +620,7 @@ class: center, middle
 * 高い可用性
     * 他のサービスの障害に影響を受けないように
         * 非同期/ノンブロッキングAPI
-        * CircuitBreaker
+        * Circuit Breaker
     * 障害から復旧できるように
         * Sharding
 * 高いスケーラビリティ
