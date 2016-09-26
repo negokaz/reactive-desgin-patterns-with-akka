@@ -457,7 +457,7 @@ responseSize.thenAccept(size -> doSomething(size));
 * .with-checkbox-on[非同期/ノンブロッキングなAPI]
 * .with-checkbox-on[Sharding によるステートフルなアーキテクチャ]
 * **.with-checkbox-off[分散型の永続化機構]**
-  * **[Event Sourcing + CQRS]**
+  * **Event Sourcing + CQRS**
 * .with-checkbox-off[Circuit Breaker]
 
 ---
@@ -507,7 +507,7 @@ responseSize.thenAccept(size -> doSomething(size));
 
 ## Event Sourcing？
 
-* Entity の状態が失われた場合は、<br>イベントを **[再生]** して状態を復元する
+* Entity の状態が失われた場合は、<br>イベントを **再生** して状態を復元する
 * イベントは不変(immutable)
     * ロック不要・復数のノードに分散して書き込める
         * 書き込みをスケールしやすい
