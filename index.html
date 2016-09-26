@@ -188,10 +188,14 @@ Scala や Akka、Play といった技術の検証やコンサルを おこなっ
 MSAの開発で汎用的に使えるデザインパターンに近い
 
 ---
-class: center, middle
 
-## 非同期/ノンブロッキングなAPI
+## Lagom が Reactive を達成する道具
 
+* **.with-checkbox-off.accent[非同期/ノンブロッキングなAPI]**
+* .with-checkbox-off[Sharding によるステートフルなアーキテクチャ]
+* .with-checkbox-off[分散型の永続化機構]
+  * Event Sourcing + CQRS
+* .with-checkbox-off[Circuit Breaker]
 ---
 
 ## なぜ必要か？
@@ -319,9 +323,14 @@ responseSize.thenAccept(size -> doSomething(size));
 * 外部サービスの呼び出しやDBの操作をするようなAPIは 全て非同期/ノンブロッキング
 
 ---
-class: center, middle
 
-## Sharding による<br>ステートフルなアーキテクチャ
+## Lagom が Reactive を達成する道具
+
+* .with-checkbox-on[非同期/ノンブロッキングなAPI]
+* **.with-checkbox-off.accent[Sharding によるステートフルなアーキテクチャ]**
+* .with-checkbox-off[分散型の永続化機構]
+  * Event Sourcing + CQRS
+* .with-checkbox-off[Circuit Breaker]
 
 ---
 
@@ -437,9 +446,14 @@ class: center, middle
 .with-arrow[私たちは Entity の実装に集中できる]
 
 ---
-class: middle, center
 
-## 分散型の永続化機構
+## Lagom が Reactive を達成する道具
+
+* .with-checkbox-on[非同期/ノンブロッキングなAPI]
+* .with-checkbox-on[Sharding によるステートフルなアーキテクチャ]
+* **.with-checkbox-off.accent[分散型の永続化機構]**
+  * **.accent[Event Sourcing + CQRS]**
+* .with-checkbox-off[Circuit Breaker]
 
 ---
 
@@ -554,9 +568,14 @@ exclude: true
   * ネットワーク障害
 
 ---
-class: center, middle
 
-## Circuit Breaker
+## Lagom が Reactive を達成する道具
+
+* .with-checkbox-on[非同期/ノンブロッキングなAPI]
+* .with-checkbox-on[Sharding によるステートフルなアーキテクチャ]
+* .with-checkbox-on[分散型の永続化機構]
+  * Event Sourcing + CQRS
+* **.with-checkbox-off.accent[Circuit Breaker]**
 
 ---
 
