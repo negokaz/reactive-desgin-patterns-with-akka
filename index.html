@@ -278,7 +278,7 @@ class: center, middle
 
 ---
 
-## コードの複雑さ
+## 非同期/ノンブロッキング API の<br>デメリット
 
 * 同期/ブロッキング API
 
@@ -304,6 +304,13 @@ responseSize.thenAccept(size -> doSomething(size));
 .footnote[
 [Java SE 8 API - CompletionStage&amp;lt;T&amp;gt;](https://docs.oracle.com/javase/jp/8/docs/api/java/util/concurrent/CompletionStage.html)
 ]
+
+---
+
+## 非同期/ノンブロッキング API の<br>デメリット
+
+* コード量が増える
+* スレッドセーフな実装になるよう注意する必要がある
 
 ---
 
