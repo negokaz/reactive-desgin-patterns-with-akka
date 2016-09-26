@@ -3836,6 +3836,9 @@ img {
   display: block;
   object-fit: contain;
 }
+.without-margin * {
+  margin: 0;
+}
 /* --- option --- */
 .glass {
   color: rgba(0, 0, 0, 0.7);

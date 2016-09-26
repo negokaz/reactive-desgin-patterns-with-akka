@@ -446,46 +446,35 @@ class: middle, center
 
 * システムの中で起きた**イベント**を永続化する
 * イベントをデータストアに INSERT していく
-* イベントは不変(immutable)
-    * ロック不要・復数のノードに分散して書き込める
-        * 書き込みをスケールしやすい
-    * キャッシュ・コピー・共有が容易
-        * 読み込みをスケールしやすい
-        * データの耐久性を高くできる
-* Lagom では Entity の状態を復元するのに使う
 
----
+--
 
-## Event Sourcing？
-
-* システムの中で起きた**イベント**を永続化する
-
-.as-underlay[
-.height-14[![](r/img/event-sourcing.1.svg)]
+.as-underlay.without-margin[
+.height-13[![](r/img/event-sourcing.1.svg)]
 ]
 
 --
 
-.as-underlay[
-.height-14[![](r/img/event-sourcing.2.svg)]
+.as-underlay.without-margin[
+.height-13[![](r/img/event-sourcing.2.svg)]
 ]
 
 --
 
-.as-underlay[
-.height-14[![](r/img/event-sourcing.3.svg)]
+.as-underlay.without-margin[
+.height-13[![](r/img/event-sourcing.3.svg)]
 ]
 
 --
 
-.as-underlay[
-.height-14[![](r/img/event-sourcing.4.svg)]
+.as-underlay.without-margin[
+.height-13[![](r/img/event-sourcing.4.svg)]
 ]
 
 --
 
-.as-underlay[
-.height-14[![](r/img/event-sourcing.5.svg)]
+.as-underlay.without-margin[
+.height-13[![](r/img/event-sourcing.5.svg)]
 ]
 
 ---
@@ -493,8 +482,20 @@ class: middle, center
 ## Event Sourcing？
 
 * Entity の状態が失われた場合は、<br>イベントを **.accent[再生]** して状態を復元する
+* イベントは不変(immutable)
+    * ロック不要・復数のノードに分散して書き込める
+        * 書き込みをスケールしやすい
+    * キャッシュ・コピー・共有が容易
+        * 読み込みをスケールしやすい
+        * データの耐久性を高くできる
+
+---
+
+## Event Sourcing？
+
 * デメリット
   * データの集計にコストがかかる
+--
 .with-arrow[CQRSで解決できる]
 
 ---
