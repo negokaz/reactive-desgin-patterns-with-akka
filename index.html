@@ -606,12 +606,10 @@ exclude: true
 
 ## Circuit Breaker とは？
 
-.small[
-* 外部サービスに障害が起きているとき、すぐエラーの応答を返す仕組み
-    * 障害時のリトライによるネットワーク帯域の無駄遣いが減る
-    * レイテンシを低く抑えられる
+外部サービスの障害時、即座にエラーの応答を返す仕組み
+* リトライによるネットワーク帯域の無駄遣いが減る
+* レイテンシを低く抑えられる
 * **Close**・**Open**・**Half-Open** の状態をとる
-]
 
 .center.height-6[
 ![](http://www.lagomframework.com/documentation/1.2.x/java/resources/guide/services/circuit-breaker-states.png)
@@ -639,17 +637,15 @@ exclude: true
 
 ## Circuit Breaker のしくみ
 
-.center.height-6[
+.center.height-5[
 ![](http://www.lagomframework.com/documentation/1.2.x/java/resources/guide/services/circuit-breaker-states.png)
 ]
 
-.small[
 * **Close**: 外部サービスへリクエストする
 * **Open**: すぐにエラーを返す
 * **Half-Open**: リクエストを試す
     * Open から一定時間で切り替わる
     * リクエストが成功したら Close に戻る
-]
 
 .footnote[
 引用: [Lagom #Consuming services](http://www.lagomframework.com/documentation/1.2.x/java/ServiceClients.html#Circuit-Breakers)
