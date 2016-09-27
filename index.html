@@ -109,8 +109,8 @@ Scala や Akka、Play といった技術の検証やコンサルを おこなっ
 
 * MSAにすると **.big[分散システム]** になる
 
-.float.bottom-3.right-15[
-.height-12[![](r/img/hato_mure.png)]
+.center[
+.height-12[![](r/img/computer_p2p.png)]
 ]
 
 ---
@@ -335,6 +335,18 @@ responseSize.thenAccept(size -> doSomething(size));
 * 外部サービスの呼び出しやDBの操作をするようなAPIは 全て非同期/ノンブロッキング
 
 ---
+exclude: true
+
+## Lagom 以外では
+
+* HTTP
+  * ![Play - WS API](https://www.playframework.com/documentation/2.5.x/ScalaWS)
+  * ![Gigahorse](http://eed3si9n.com/gigahorse/)
+* DB
+  * ![Java Driver for Apache Cassandra](https://github.com/datastax/java-driver)
+  * ![postgresql-async & mysql-async](https://github.com/mauricio/postgresql-async)
+
+---
 
 ## Lagom が Reactive を達成する道具
 
@@ -449,6 +461,13 @@ responseSize.thenAccept(size -> doSomething(size));
 --
 
 .with-arrow[私たちは Entity の実装に集中できる]
+
+---
+exclude: true
+
+## Lagom 以外では
+
+* ![akka - Cluster Sharding](http://doc.akka.io/docs/akka/current/scala/cluster-sharding.html)
 
 ---
 
@@ -644,6 +663,14 @@ exclude: true
 .center[
 ![](r/img/cb-call.svg)
 ]
+
+---
+exclude: true
+
+## Lagom 以外では
+
+* ![Netflix - Hystrix](https://github.com/Netflix/Hystrix)
+* ![akka - Circuit Breaker](http://doc.akka.io/docs/akka/current/common/circuitbreaker.html)
 
 ---
 
