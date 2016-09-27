@@ -18,7 +18,6 @@ layout: true
 
 ---
 class: center, middle
-background-image: url("r/img/title-background.jpg")
 
 .glass[
 # Lagom で学ぶ<br>Reactive<br>Microservices Architecture
@@ -49,8 +48,9 @@ Reactiveness はシステムが大規模になるほど重要になってきま�
 
 ???
 
-私たちは Reactive System の推進をミッションとしていて、Lightbend Reactive Platform つまり
-Scala や Akka、Play といった技術の検証やコンサルを おこなっています。
+私たちは Reactive System の推進をミッションとしていて、
+Lightbend Reactive Platform つまり Scala や Akka、Play といった技術の
+検証やコンサルを おこなっています。
 
 ---
 
@@ -75,6 +75,11 @@ Scala や Akka、Play といった技術の検証やコンサルを おこなっ
 [Reactive Microservices Architecture (O’Reilly)](http://www.oreilly.com/programming/free/reactive-microservices-architecture.html)
 ]
 
+???
+まず、Lagom の紹介をしておきます
+
+* Reactive Microservices Architecture: 造語で、Lightbend社のCTOが書いた本に出てくる言葉
+
 ---
 
 ## Microservices Architecture？
@@ -84,9 +89,14 @@ Scala や Akka、Play といった技術の検証やコンサルを おこなっ
 * システムを分割することにより .strong[様々な利点]が得られる
 * (長いので以降は *MSA* と略します)
 
+???
+マイクロサービスアーキテクチャのおさらい
+
+* 大きな一枚岩で作られたシステムを分割することによって
+
 ---
 
-## MSAのメリット
+## MSAの利点
 
 * 異なるチームで独立して開発できる
     * コミュニケーションコストを抑えることができる
@@ -98,12 +108,14 @@ Scala や Akka、Play といった技術の検証やコンサルを おこなっ
     * 全体の可用性を高めることができる
 
 ???
-
-* コミュニケーションのコストは n^2 のオーダーで増加する (by ブルックスの法則)
+どのような利点が得られるのでしょうか？
 
 ---
 
 ## MSA化の注意点
+
+???
+ただ、MSAにするにあたり注意すべきことがあります
 
 --
 
@@ -112,6 +124,9 @@ Scala や Akka、Play といった技術の検証やコンサルを おこなっ
 .center[
 .height-12[![](r/img/computer_p2p.png)]
 ]
+
+???
+MASにすると分散システムになるということです
 
 ---
 
@@ -134,6 +149,9 @@ Scala や Akka、Play といった技術の検証やコンサルを おこなっ
 [Wikipedia - 分散コンピューティングの落とし穴](https://ja.wikipedia.org/wiki/%E5%88%86%E6%95%A3%E3%82%B3%E3%83%B3%E3%83%94%E3%83%A5%E3%83%BC%E3%83%86%E3%82%A3%E3%83%B3%E3%82%B0%E3%81%AE%E8%90%BD%E3%81%A8%E3%81%97%E7%A9%B4)
 ]
 
+???
+なぜ注意しないといけないのか、というと「分散コンピューティングには落とし穴」という話があります
+
 ---
 
 ## つまり
@@ -149,9 +167,16 @@ Scala や Akka、Play といった技術の検証やコンサルを おこなっ
 .height-7[![](r/img/atama_kakaeru_man.png)]
 ]
 
+???
+つまり
+
 --
 
 .with-arrow[この問題を最小化したい]
+
+???
+-----
+で、この問題を最小化するにはどうすればよいのでしょうか。
 
 ---
 
@@ -172,6 +197,9 @@ Scala や Akka、Play といった技術の検証やコンサルを おこなっ
 .height-9[![](r/img/yuusya_game.png)]
 ]
 
+???
+この問題に立ち向かっているのが、Lagom です。
+
 ---
 
 ## Reactive のおさらい
@@ -185,8 +213,12 @@ Scala や Akka、Play といった技術の検証やコンサルを おこなっ
 ]
 
 ???
+ここで、Reactive という言葉のおさらいをしておきます。
+リアクティブシステムはシステムを形容する言葉です。
 
-リアクティブな性質を持たせることで、これらの問題を軽減
+* 実現したい価値 → 即応性
+* 即応性を実現するためには、弾力性とレジリエンスも必要
+* その全ては非同期のメッセージ駆動によってもたらされる
 
 ---
 
@@ -198,10 +230,19 @@ Scala や Akka、Play といった技術の検証やコンサルを おこなっ
   * Event Sourcing + CQRS
 * Circuit Breaker
 
+???
+では、もう少し具体的に Lagom はどうやってこの Reactive を実現しているのかを見ていきましょう。
+
+Lagom はここに挙げたようなものを備えています。
+
 --
 
 これらは、Lagom でしか適用できないというものではない
 MSAの開発で汎用的に使えるデザインパターンに近い
+
+???
+-----
+(本文)
 
 ---
 
@@ -212,12 +253,21 @@ MSAの開発で汎用的に使えるデザインパターンに近い
 * .with-checkbox-off[分散型の永続化機構]
   * Event Sourcing + CQRS
 * .with-checkbox-off[Circuit Breaker]
+
+???
+では、それぞれ具体的に見ていきましょう。
+
+まず、「非同期/ノンブロッキングなAPI」です。
+
 ---
 
 ## なぜ必要か？
 
 * レイテンシを小さくする
 * 外部サービスの障害時に影響を受けにくくする
+
+???
+なぜ、「非同期/ノンブロッキングな」APIが必要なのでしょうか？
 
 ---
 
@@ -228,6 +278,9 @@ MSAの開発で汎用的に使えるデザインパターンに近い
 .center[
 .width-23[![](r/img/api-call.blocking.svg)]
 ]
+
+???
+
 
 ---
 

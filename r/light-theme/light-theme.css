@@ -2,7 +2,7 @@
 /* Container */
 /*************/
 @import url(http://fonts.googleapis.com/earlyaccess/notosansjp.css);
-@import url(http://mplus-webfonts.sourceforge.jp/mplus_webfonts.css);
+@import url(fonts/mplus-1m/mplus-1m.css);
 html.remark-container,
 body.remark-container {
   height: 100%;
