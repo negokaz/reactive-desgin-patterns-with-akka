@@ -280,8 +280,13 @@ MSAの開発で汎用的に使えるデザインパターンに近い
 ]
 
 ???
+詳しく見ていきましょう。
 
+とある API を実装することを考えてみます。
+この API の中では 5 つの外部 API を同期的に呼び出します。
+それぞれの API は 100ms で応答を返します。
 
+このとき、全ての API を呼び出すのに合計で 500ms かかることになります。
 ---
 
 ## 非同期にAPIを呼び出す
@@ -292,11 +297,20 @@ MSAの開発で汎用的に使えるデザインパターンに近い
 .width-23[![](r/img/api-call.non-blocking.svg)]
 ]
 
+???
+では、外部 API の呼び出しを非同期にするとどうなるでしょうか。
+
+それぞれの外部APIに同時にリクエストを投げて、100ms 後にそれぞれのAPIからの応答を受け取ります。
+
 --
 
 .float-bottom-5[
 .with-arrow.glass[1/5 の時間で応答を返せる！]
 ]
+
+???
+-----
+つまり、1/5 の時間で応答を返せるということです。
 
 ---
 
@@ -308,6 +322,16 @@ MSAの開発で汎用的に使えるデザインパターンに近い
 .width-22[![](r/img/thread.blocking.svg)]
 ]
 
+???
+次に、スレッドの動きを見ていきましょう。
+
+Service a から Service b にリクエストを送ることを考えます。
+Service a は同期的に Service b を呼び出しています。
+
+Service b を呼び出した後、そのスレッドはレスポンスを待ち続けます。
+その間、そのスレッドでは他の処理ができません。
+スレッドがブロックしている状態です。
+
 ---
 
 ## ノンブロッキングでタスクを実行する
@@ -317,6 +341,14 @@ MSAの開発で汎用的に使えるデザインパターンに近い
 .center[
 .width-22[![](r/img/thread.non-blocking.svg)]
 ]
+
+???
+
+非同期ノンブロッキングで処理をする場合はどうなるでしょうか。
+
+この場合は、Service b を呼び出したスレッドはリクエストに対するレスポンスを待たなくなります。
+つまり、レスポンスが返ってくるまでの間、他の処理ができます。
+これにより、より効率的にリソースを使えるようになります。
 
 ---
 
@@ -328,6 +360,13 @@ MSAの開発で汎用的に使えるデザインパターンに近い
 .width-22[![](r/img/thread.fail-blocking.1.svg)]
 ]
 
+???
+ノンブロッキングの利点はそれだけではありません。
+何らかの障害が起きて Service b からの応答が受け取れなかったときのことを考えてみます。
+
+スレッドがブロックするようになっていると、応答が返ってこないのでずっとブロックすることになります。
+そうなると、新たに Service b を呼び出す処理が呼ばれると、他のスレッドを使って呼び出す必要がでてきます。
+
 ---
 
 ## ブロックしてタスクを実行する
@@ -337,6 +376,11 @@ MSAの開発で汎用的に使えるデザインパターンに近い
 .center[
 .width-22[![](r/img/thread.fail-blocking.2.svg)]
 ]
+
+???
+こうやって、たくさん Service b を呼び出す処理が呼ばれたとすると、このようにスレッドがどんどん消費されていきます。
+
+最終的にはメモリを食い潰してそのホストのパフォーマンスを劣化させます。
 
 ---
 
@@ -348,6 +392,8 @@ MSAの開発で汎用的に使えるデザインパターンに近い
 .width-22[![](r/img/thread.fail-non-blocking.svg)]
 ]
 
+???
+ノンブロッキングにしておくと、相手が応答しなかったとしても、スレッドがブロックしないので他の処理を実行でき、スレッドを大量に消費するといったことは起きません。
 
 ---
 
@@ -378,6 +424,11 @@ responseSize.thenAccept(size -> doSomething(size));
 [Java SE 8 API - CompletionStage&amp;lt;T&amp;gt;](https://docs.oracle.com/javase/jp/8/docs/api/java/util/concurrent/CompletionStage.html)
 ]
 
+???
+ただ、非同期/ノンブロッキング の API を使うときにはデメリットがあります。
+ここには同期的なAPIのコードと非同期なAPIのコードの例を書きました。
+両者では全く同じことをやっています。
+
 ---
 
 ## 非同期/ノンブロッキング API の<br>デメリット
@@ -385,11 +436,20 @@ responseSize.thenAccept(size -> doSomething(size));
 * コード量が増える
 * スレッドセーフな実装になるよう注意する必要がある
 
+???
+これを見てわかるとおり、非同期の API ではコード量が多くなります。
+
+また、複数の非同期処理からある変数を更新する場合など、スレッドセーフになるように注意して実装する必要があります。
+
 ---
 
 ## Lagom では
 
 * 外部サービスの呼び出しやDBの操作をするようなAPIは 全て非同期/ノンブロッキング
+
+???
+
+Lagom では、Reactive を達成するために、外部サービスの呼び出しやDBにアクセスする部分のAPIは全て非同期/ノンブロッキングで実装するようになっています。
 
 ---
 
@@ -402,6 +462,9 @@ responseSize.thenAccept(size -> doSomething(size));
   * [Java Driver for Apache Cassandra](https://github.com/datastax/java-driver)
   * [postgresql-async & mysql-async](https://github.com/mauricio/postgresql-async)
 
+???
+Lagom 以外で、外部サービスの呼び出しやDBアクセスを非同期/ノンブロッキングにするには、どうすれば良いかというと、ここに挙げたような方法があります。
+
 ---
 
 ## Lagom が Reactive を達成する道具
@@ -412,6 +475,9 @@ responseSize.thenAccept(size -> doSomething(size));
   * Event Sourcing + CQRS
 * .with-checkbox-off[Circuit Breaker]
 
+???
+次に、Sharding によるステートフルなアーキテクチャについて見ていきます。
+
 ---
 
 ## Sharding？
@@ -419,22 +485,32 @@ responseSize.thenAccept(size -> doSomething(size));
 * 負荷分散の手法の一つ
 * 単一障害点がないため高い可用性を実現できる
 * Lagomでは単体のサービスをスケールするのに利用される
+* **Entity** を分散させて負荷を分散する
 
 ???
-
-`shardId = (math.abs(entityId.hashCode) % maxNumberOfShards)`
+Sharding というのは、負荷分散手法の一つです。
 
 ---
 
-## ステートフルな Entity
+## Entity？
 
-* Lagom では Entity がオンメモリで状態を持つ
-* 状態は DB にバックアップされる
+* Entity がサービスの状態を更新するためのロジックと、サービスの現在の状態を分散して持つ
+* 状態は オンメモリで管理され、<br>DB にバックアップされる
 * 状態を DB に問い合わせる必要がない
     * レイテンシを抑えられる
-* Entity には位置透過性があり、ノード間を移動できる
+* Entity には*位置透過性*があり、ノード間を移動できる
     * ノードやネットワークに障害があっても復旧できる
 
+???
+Lagom では Entity と呼ばれるものがサービスの状態をどのように更新するかというロジックと、
+サービスの現在の状態を分散して持ちます。
+
+Entity の状態は、メモリ上に保持され DB にバックアップされます。
+
+状態がメモリ上にあるため、状態を参照したいときは Entity のプロパティを直接参照すればよく、レイテンシが抑えられます。
+
+また、Entity は位置透過性という性質を持つように作られており、物理的なノード間を移動できるようになっています。
+これによって、Entity が居るノードに障害が起きたとしても、自動で復旧できるようになっています。
 ---
 
 ## 例えば？
@@ -448,6 +524,11 @@ responseSize.thenAccept(size -> doSomething(size));
 .height-8[![](r/img/jinmyaku.png)]
 ]
 
+???
+ちょっと Entity のイメージが付きづらいと思うので、具体例をあげます。
+
+(本文)
+
 ---
 
 ## Sharding？
@@ -457,6 +538,11 @@ responseSize.thenAccept(size -> doSomething(size));
 ]
 
 .height-18[![](r/img/sharding-architecture.2.svg)]
+
+???
+では、この Entity が Sharding でどのように振る舞うのかを見ていきます。
+
+まず、Entity は Shard と呼ばれるグループに分けられます。
 
 ---
 
@@ -468,6 +554,9 @@ responseSize.thenAccept(size -> doSomething(size));
 
 .height-18[![](r/img/sharding-architecture.3.svg)]
 
+???
+この Shard 単位で物理的なノードに配置されます。
+
 ---
 
 ## Sharding？
@@ -477,6 +566,9 @@ responseSize.thenAccept(size -> doSomething(size));
 ]
 
 .height-18[![](r/img/sharding-architecture.4.svg)]
+
+???
+もし、Shard が存在しているノードに障害が起きたら
 
 ---
 
@@ -488,6 +580,9 @@ responseSize.thenAccept(size -> doSomething(size));
 
 .height-18[![](r/img/sharding-architecture.5.svg)]
 
+???
+別のノードに Shard が移動します。
+
 ---
 
 ## Sharding？
@@ -497,6 +592,9 @@ responseSize.thenAccept(size -> doSomething(size));
 ]
 
 .height-18[![](r/img/sharding-architecture.6.svg)]
+
+???
+新しくノードを追加すると
 
 ---
 
@@ -508,21 +606,36 @@ responseSize.thenAccept(size -> doSomething(size));
 
 .height-18[![](r/img/sharding-architecture.7.svg)]
 
+???
+リバランスという処理が行われて、再び元の状態に戻ります。
+
 ---
 
 ## Lagom では
 
 この仕組みは Lagom によって提供される
 
+???
+この仕組みは Lagom によって提供されるので、実際にアプリを作るときはほとんど意識する必要がありません。
+
 --
 
 .with-arrow[私たちは Entity の実装に集中できる]
+
+???
+-----
+なので、私たちは Entity のロジックの実装に集中することができます。
 
 ---
 
 ## Lagom 以外で実現する方法
 
 * [Akka - Cluster Sharding](http://doc.akka.io/docs/akka/current/scala/cluster-sharding.html)
+
+???
+Lagom 以外で実現する方法としては、Akka の Cluster Sharding と呼ばれるモジュールを使う方法があります。
+
+実は、Lagom の中でもこれが使われています。
 
 ---
 
@@ -626,7 +739,7 @@ responseSize.thenAccept(size -> doSomething(size));
     * 書き込み・読み込みで*完全な一貫性*を保てない
       * 十分な時間が経つと整合性がとれる (結果整合性)
 .with-arrow[一時的に一貫性が取れてなくても問題ないよう ビジネスやシステムを設計する]
-* Lagom では Entity をまたがる集計などを行うのに使う
+* Lagom では Entity をまたがる集計などを行うのに使える
     * 例) その日の振込金額の合計
 
 ---
