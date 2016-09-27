@@ -338,16 +338,15 @@ responseSize.thenAccept(size -> doSomething(size));
 * 外部サービスの呼び出しやDBの操作をするようなAPIは 全て非同期/ノンブロッキング
 
 ---
-exclude: true
 
-## Lagom 以外では
+## Lagom 以外で実現する方法
 
 * HTTP
-  * ![Play - WS API](https://www.playframework.com/documentation/2.5.x/ScalaWS)
-  * ![Gigahorse](http://eed3si9n.com/gigahorse/)
+  * [Play - WS API](https://www.playframework.com/documentation/2.5.x/ScalaWS)
+  * [Gigahorse](http://eed3si9n.com/gigahorse/)
 * DB
-  * ![Java Driver for Apache Cassandra](https://github.com/datastax/java-driver)
-  * ![postgresql-async & mysql-async](https://github.com/mauricio/postgresql-async)
+  * [Java Driver for Apache Cassandra](https://github.com/datastax/java-driver)
+  * [postgresql-async & mysql-async](https://github.com/mauricio/postgresql-async)
 
 ---
 
@@ -466,11 +465,10 @@ exclude: true
 .with-arrow[私たちは Entity の実装に集中できる]
 
 ---
-exclude: true
 
-## Lagom 以外では
+## Lagom 以外で実現する方法
 
-* ![akka - Cluster Sharding](http://doc.akka.io/docs/akka/current/scala/cluster-sharding.html)
+* [Akka - Cluster Sharding](http://doc.akka.io/docs/akka/current/scala/cluster-sharding.html)
 
 ---
 
@@ -668,12 +666,11 @@ exclude: true
 ]
 
 ---
-exclude: true
 
-## Lagom 以外では
+## Lagom 以外で実現する方法
 
-* ![Netflix - Hystrix](https://github.com/Netflix/Hystrix)
-* ![akka - Circuit Breaker](http://doc.akka.io/docs/akka/current/common/circuitbreaker.html)
+* [Netflix - Hystrix](https://github.com/Netflix/Hystrix)
+* [Akka - Circuit Breaker](http://doc.akka.io/docs/akka/current/common/circuitbreaker.html)
 
 ---
 
