@@ -117,7 +117,7 @@ Scala や Akka、Play といった技術の検証やコンサルを おこなっ
 
 ## 分散コンピューティングの落とし穴
 
-分散システムを開発するときに想定してしまいがちな、誤った前提
+分散システムを開発するときに<br>想定してしまいがちな*誤った*前提
 
 * ネットワークは信頼できる。
 * 帯域幅は無限である。
@@ -126,8 +126,8 @@ Scala や Akka、Play といった技術の検証やコンサルを おこなっ
 
 .small[(一部抜粋)]
 
-.float.bottom-10.right-0[
-.height-10[![](r/img/otoshiana.png)]
+.float.bottom-15.right-5[
+.height-8[![](r/img/otoshiana.png)]
 ]
 
 .footnote[
@@ -140,8 +140,8 @@ Scala や Akka、Play といった技術の検証やコンサルを おこなっ
 
 モノリシックなシステムを単純に分割するだけでは
 
-* 障害点が増えて可用性が下がる
-* オーバーヘッドが増えてレイテンシが大きくなる
+* 障害点が増えて*可用性が下がる*
+* オーバーヘッドが増えて*レイテンシが大きくなる*
 
 大規模になるほど、この問題が目立ってくる
 
@@ -157,13 +157,13 @@ Scala や Akka、Play といった技術の検証やコンサルを おこなっ
 
 ## この問題に立ち向かうのが Lagom
 
-* Lagom は Reactive な Microservices を目指すフレームワーク
+* Lagom は **Reactive** な Microservices を目指すフレームワーク
 * Reactive を達成するための様々な道具を備えている
 
 その道具を用いることで
 
 * 可用性
-* パフォーマンス
+* 応答速度
 * (さらにもう一歩進んで) スケーラビリティ
 
 を上げることができる
@@ -522,7 +522,7 @@ responseSize.thenAccept(size -> doSomething(size));
 * デメリット
   * データの集計にコストがかかる
 --
-.with-arrow[CQRSで解決できる]
+.with-arrow[**CQRS** で解決できる]
 
 ---
 
@@ -534,7 +534,7 @@ responseSize.thenAccept(size -> doSomething(size));
 * 書き込み側と読み込み側で
     * 異なるDB・データ構造が使える
     * 別々にスケールできるようになる
-.with-arrow[Command-Side にイベントソーシングを使い<br>Query-Side に集計しやすい形で永続化する]
+.with-arrow[Command-Side に Event Sourcing を使い<br>Query-Side に集計しやすい形で永続化する]
 
 ---
 
@@ -639,7 +639,7 @@ exclude: true
 
 ## Lagom では
 
-* 外部へのリクエストは全て CircitBreaker を通じて行う
+* 外部へのリクエストは全て Circuit Breaker を通じて行う
 
 .center[
 ![](r/img/cb-call.svg)
