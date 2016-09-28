@@ -647,11 +647,17 @@ Lagom 以外で実現する方法としては、Akka の Cluster Sharding と呼
   * **Event Sourcing + CQRS**
 * .with-checkbox-off[Circuit Breaker]
 
+???
+次は、分散型の永続化機構である Event Sourcing と CQRS について見ていきます
+
 ---
 
 ## 分散型の永続化機構
 
-.strong[Event Sourcing] と .strong[CQRS] による永続化のしくみを 備えており、データの読み込みと書き込みの両方を スケールできるようになっている
+Lagom は .strong[Event Sourcing] と .strong[CQRS] による永続化のしくみ<br>を備えており、データの読み込みと書き込みの両方を<br>スケールできるようになっている
+
+???
+(本文)
 
 ---
 
@@ -660,11 +666,26 @@ Lagom 以外で実現する方法としては、Akka の Cluster Sharding と呼
 * システムの中で起きた**イベント**を永続化する
 * イベントをデータストアに INSERT していく
 
+???
+Event Sourcing とは…
+
+(本文)
+
+どういうことかというと…
+
 --
 
 .as-underlay.without-margin[
 .height-13[![](r/img/event-sourcing.1.svg)]
 ]
+???
+-----
+例えば、銀行口座のシステムを考えてみましょう。
+一つの銀行口座が Entity になります。
+まず、私が銀行で口座の開設の申込をすると、行員の方がシステムに口座を作ります。
+
+このときに、口座番号 10 の口座を開設 というイベントがシステム内で発生します。
+口座の Entity は状態として、口座番号と、現在の残高を持ちます。
 
 --
 
@@ -702,14 +723,28 @@ Lagom 以外で実現する方法としては、Akka の Cluster Sharding と呼
         * 読み込みをスケールしやすい
         * データの耐久性を高くできる
 
+???
+
+Entity が存在しているノードに障害が起きたりして、メモリ上から Entity の状態がなくなってしまった場合は…
+
+ここで重要なのが、イベントが不変であるという性質です。
+
 ---
 
 ## Event Sourcing？
 
 * デメリット
   * データの集計にコストがかかる
+
+???
+ただ、Event Sourcing にもデメリットがあります。
+
 --
 .with-arrow[**CQRS** で解決できる]
+
+???
+それは、データの集計にコストがかかるという点です。
+このデメリットは CQRS というパターンを使うと、解決できます。
 
 ---
 
@@ -723,6 +758,13 @@ Lagom 以外で実現する方法としては、Akka の Cluster Sharding と呼
     * 別々にスケールできるようになる
 .with-arrow[Command-Side に Event Sourcing を使い<br>Query-Side に集計しやすい形で永続化する]
 
+???
+CQRS というのは、Command Query Responsibility Segregation の頭文字をとったもので、
+
+(本文)
+
+そうすることで、集計にかかるコストを低く抑えることができます。
+
 ---
 
 ## CQRS？
@@ -730,6 +772,16 @@ Lagom 以外で実現する方法としては、Akka の Cluster Sharding と呼
 .center[
 .height-16[![](r/img/es-and-cqrs.svg)]
 ]
+
+???
+もう少し具体的に図で見ていきます。
+
+* API Call
+* Entity
+* EventStore
+* EventProcessor
+* QueryStore
+* (Query) API Call
 
 ---
 
@@ -739,25 +791,12 @@ Lagom 以外で実現する方法としては、Akka の Cluster Sharding と呼
     * 書き込み・読み込みで*完全な一貫性*を保てない
       * 十分な時間が経つと整合性がとれる (結果整合性)
 .with-arrow[一時的に一貫性が取れてなくても問題ないよう ビジネスやシステムを設計する]
-* Lagom では Entity をまたがる集計などを行うのに使える
+* Entity をまたがる集計などを行うのに使える
     * 例) その日の振込金額の合計
 
----
-exclude: true
-
-## デモ？
-
----
-exclude: true
-
-## ReadSide への遅延の理由
-
-* Timestamp ベースでイベントの順序を決める
-* EventProcessor が参照するDBにイベントが反映されるタイミングがまばら
-* 全イベントを拾えるようにあえて遅延させている
-* `cassandra-query-journal.eventual-consistency-delay = 10s`
-* とは言いつつ全イベントが拾えることを保証するものではない
-  * ネットワーク障害
+???
+この CQRS にもデメリットがあります。
+どういうユースケースがあるかというと、Entity をまたがる集計などを行う
 
 ---
 
@@ -769,6 +808,10 @@ exclude: true
   * Event Sourcing + CQRS
 * **.with-checkbox-off[Circuit Breaker]**
 
+???
+最後に Circuit Breaker を見ていきます。
+
+
 ---
 
 ## Circuit Breaker とは？
@@ -776,15 +819,17 @@ exclude: true
 外部サービスの障害時、即座にエラーの応答を返す仕組み
 * リトライによるネットワーク帯域の無駄遣いが減る
 * レイテンシを低く抑えられる
+    * 障害の連鎖を防ぐことができる
 * **Close**・**Open**・**Half-Open** の状態をとる
-
-.center.height-6[
-![](http://www.lagomframework.com/documentation/1.2.x/java/resources/guide/services/circuit-breaker-states.png)
-]
 
 .footnote[
 引用: [Lagom #Consuming services](http://www.lagomframework.com/documentation/1.2.x/java/ServiceClients.html#Circuit-Breakers)
 ]
+
+???
+Circuit Breaker とは、
+
+(本文)
 
 ---
 
@@ -799,6 +844,11 @@ exclude: true
 
 * **Close**: 回路が**閉じた**状態 = 通信できる
 * **Open**: 回路が**開いた**状態 = 通信が遮断されている
+
+???
+Close と Open がややこしいので、解説しておきます
+
+(本文)
 
 ---
 
@@ -818,6 +868,11 @@ exclude: true
 引用: [Lagom #Consuming services](http://www.lagomframework.com/documentation/1.2.x/java/ServiceClients.html#Circuit-Breakers)
 ]
 
+???
+システムの世界の Circuit Breaker はどのように振る舞うかというと、こうなります。
+
+(本文)
+
 ---
 
 ## Lagom では
@@ -828,12 +883,22 @@ exclude: true
 ![](r/img/cb-call.svg)
 ]
 
+???
+Lagom では、
+
+(本文)
+
 ---
 
 ## Lagom 以外で実現する方法
 
 * [Netflix - Hystrix](https://github.com/Netflix/Hystrix)
 * [Akka - Circuit Breaker](http://doc.akka.io/docs/akka/current/common/circuitbreaker.html)
+
+???
+Lagom 以外で実現するには
+
+(本文)
 
 ---
 
@@ -842,6 +907,10 @@ exclude: true
 モノリシックなシステムを単純に分割するだけでは、可用性やパフォーマンスの問題を抱えることになる。
 
 Lagom のデザインはその問題を解決するための<br>参考になるかもしれない。
+
+???
+
+(本文)
 
 ---
 
@@ -893,6 +962,23 @@ class: center, middle
 ## イラスト
 
 * いらすとや: http://www.irasutoya.com/
+
+---
+exclude: true
+
+## デモ？
+
+---
+exclude: true
+
+## ReadSide への遅延の理由
+
+* Timestamp ベースでイベントの順序を決める
+* EventProcessor が参照するDBにイベントが反映されるタイミングがまばら
+* 全イベントを拾えるようにあえて遅延させている
+* `cassandra-query-journal.eventual-consistency-delay = 10s`
+* とは言いつつ全イベントが拾えることを保証するものではない
+  * ネットワーク障害
 
 </textarea><!-----------------↑ slide content (markdown) ↑------------------->
 
