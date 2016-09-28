@@ -61,7 +61,7 @@ Lightbend Reactive Platform つまり Scala や Akka、Play といった技術�
 
 .height-3.center[![](r/img/lagom_logo.svg)]
 
-* Lightbend社が3月にリリースしたMSA向けフレームワーク
+* Lightbend社が3月にリリースした<br>Microservices Architecture 向けフレームワーク
 * 内部 API は Java
 * コンセプトは **Reactive** *Microservices Architecture*
 
@@ -243,6 +243,19 @@ MSAの開発で汎用的に使えるデザインパターンに近い
 ???
 -----
 (本文)
+
+Lagom を使わずとも、ここに挙げたパターンを使いこなせるように
+
+---
+
+## Lagom を見習ってみよう！
+
+.center[
+![](r/img/lagom-teacher.svg)
+]
+
+???
+Lagom を見習ってみよう！というのが本日のメインテーマです。
 
 ---
 
@@ -457,7 +470,7 @@ Lagom では、Reactive を達成するために、外部サービスの呼び�
 
 ---
 
-## Lagom 以外で実現する方法
+## Lagom を使わずに実現する方法
 
 * HTTP
   * [Play - WS API](https://www.playframework.com/documentation/2.5.x/ScalaWS)
@@ -632,7 +645,7 @@ Entity の状態は、メモリ上に保持され DB にバックアップされ
 
 ---
 
-## Lagom 以外で実現する方法
+## Lagom を使わずに実現する方法
 
 * [Akka - Cluster Sharding](http://doc.akka.io/docs/akka/current/scala/cluster-sharding.html)
 
@@ -725,7 +738,7 @@ Event Sourcing とは…
 
 * Entity の状態が失われた場合は、<br>イベントを **再生** して状態を復元する
 * イベントは不変(immutable)
-    * ロック不要・復数のノードに分散して書き込める
+    * ロック不要・複数のノードに分散して書き込める
         * 書き込みをスケールしやすい
     * キャッシュ・コピー・共有が容易
         * 読み込みをスケールしやすい
@@ -761,10 +774,24 @@ Entity が存在しているノードに障害が起きたりして、メモリ�
 * .bold[C]ommand and .bold[Q]uery .bold[R]esponsibility .bold[S]egregation
     コマンドクエリ責務分離
 * コマンド(書き込み)とクエリ(読み込み)を分離する
+.center[
+.height-10[![](r/img/command-and-query.svg)]
+]
+
+---
+
+## CQRS？
+
+.without-margin[
+.center[
+.height-8[![](r/img/command-and-query.svg)]
+]
+
 * 書き込み側と読み込み側で
     * 異なるDB・データ構造が使える
     * 別々にスケールできるようになる
 .with-arrow[Command-Side に Event Sourcing を使い<br>Query-Side に集計しやすい形で永続化する]
+]
 
 ???
 CQRS というのは、Command Query Responsibility Segregation の頭文字をとったもので、
@@ -811,7 +838,7 @@ CQRS というのは、Command Query Responsibility Segregation の頭文字を�
 
 ---
 
-## Lagom 以外で実現する方法
+## Lagom を使わずに実現する方法
 
 * [Akka Persistence](http://doc.akka.io/docs/akka/current/scala/persistence.html) + [Akka Persistence Query](http://doc.akka.io/docs/akka/current/scala/persistence-query.html)
 * [Axon Framework](http://www.axonframework.org/)
@@ -895,6 +922,109 @@ Close と Open がややこしいので、解説しておきます
 
 ---
 
+## Circuit Breaker の動き
+
+*Close* のときは通信できる
+
+.center.float.bottom-10[
+.height-9[![](r/img/cb-behavior.1.svg)]
+]
+
+---
+
+## Circuit Breaker の動き
+
+外部のサービスに障害が起きて…
+
+.center.float.bottom-10[
+.height-9[![](r/img/cb-behavior.2.svg)]
+]
+
+---
+
+## Circuit Breaker の動き
+
+正しくレスポンスが受け取れなくなると *FailureCount* のカウントが始まる
+
+.center.float.bottom-10[
+.height-9[![](r/img/cb-behavior.3.svg)]
+]
+
+---
+
+## Circuit Breaker の動き
+
+外部サービスへリクエストするたびに *FailureCount* が増えて
+
+.center.float.bottom-10[
+.height-9[![](r/img/cb-behavior.4.svg)]
+]
+
+---
+
+## Circuit Breaker の動き
+
+増えて...
+
+.center.float.bottom-10[
+.height-9[![](r/img/cb-behavior.5.svg)]
+]
+
+---
+
+## Circuit Breaker の動き
+
+*FailureCount* のしきい値に達すると、*Open* になって
+
+.center.float.bottom-10[
+.height-9[![](r/img/cb-behavior.6.svg)]
+]
+
+---
+
+## Circuit Breaker の動き
+
+リクエストを通さなくなり、<br>
+*Circuit Breaker* 自身がエラーの応答を返すようになる
+
+.center.float.bottom-10[
+.height-9[![](r/img/cb-behavior.7.svg)]
+]
+
+---
+
+## Circuit Breaker の動き
+
+ある一定時間が経つと、*Half-Open* になり
+一時的にリクエストを通すようになる
+
+.center.float.bottom-10[
+.height-9[![](r/img/cb-behavior.8.svg)]
+]
+
+---
+
+## Circuit Breaker の動き
+
+
+その時に外部サービスが正常に戻っていると
+
+.center.float.bottom-10[
+.height-9[![](r/img/cb-behavior.9.svg)]
+]
+
+---
+
+## Circuit Breaker の動き
+
+*Open* になり、リクエストを通すようになる
+
+.center.float.bottom-10[
+.height-9[![](r/img/cb-behavior.10.svg)]
+]
+
+---
+
 ## Lagom では
 
 * 外部へのリクエストは全て Circuit Breaker を通じて行う
@@ -910,7 +1040,7 @@ Lagom では、
 
 ---
 
-## Lagom 以外で実現する方法
+## Lagom を使わずに実現する方法
 
 * [Netflix - Hystrix](https://github.com/Netflix/Hystrix)
 * [Akka - Circuit Breaker](http://doc.akka.io/docs/akka/current/common/circuitbreaker.html)
@@ -960,7 +1090,29 @@ Lagom のデザインはその問題を解決するための<br>参考になる�
 
 --
 
-* ただし、Reactive な設計の参考にはなる
+ただし、Reactive な設計の参考にはなる
+
+---
+
+## TIS㈱ リアクティブ・システム<br>コンサルティングサービス
+
+* Akka / Play / Scala / 本日ご紹介した設計パターン
+    * POC
+    * 設計レビュー
+    * コードレビュー
+    * システム構築
+
+.footnote[
+https://www.tis.jp/service_solution/goreactive/
+
+TIS は Lightbend 社の認定コンサルティングパートナーです
+]
+
+???
+
+リアクティブ・システムコンサルティングサービスを行っています。
+Akka, Play, Scala といったプロダクトや、本日ご紹介した設計パターンの
+POC をやってみたい。設計やコードのレビューをして欲しいという方がいらっしゃれば、是非ご相談ください。
 
 ---
 class: center, middle
