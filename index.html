@@ -24,15 +24,8 @@ class: center, middle
 ]
 
 ???
-
-近年、マイクロサービスアーキテクチャに注目が集まっています。
-そのような状況の中、米Lightbend社からマイクロサービスアーキテクチャ向けフレームワークの Lagom がリリースされました。
-Lagom は Reactive Manifesto で提唱されている Reactiveness を持つマイクロサービスの開発をサポートする、
-設計思想と機能を備えています。
-Reactiveness はシステムが大規模になるほど重要になってきます。
-この講演では Lagom の特徴的な設計思想や機能を取り上げ、
-マイクロサービスアーキテクチャを採用した大規模なシステムがとるべき振る舞いと、
-それが Lagom でどのように実現されているのかを解説します。
+Lagom で学ぶ Reactive Microservices Architecture というテーマで発表します。
+よろしくお願いします。
 
 ---
 
@@ -776,12 +769,12 @@ CQRS というのは、Command Query Responsibility Segregation の頭文字を�
 ???
 もう少し具体的に図で見ていきます。
 
-* API Call
+* API Call (POST/PUT/DELETE)
 * Entity
 * EventStore
 * EventProcessor
 * QueryStore
-* (Query) API Call
+* API Call (GET)
 
 ---
 
@@ -829,7 +822,6 @@ CQRS というのは、Command Query Responsibility Segregation の頭文字を�
 外部サービスの障害時、即座にエラーの応答を返す仕組み
 * リトライによるネットワーク帯域の無駄遣いが減る
 * レイテンシを低く抑えられる
-    * 障害の連鎖を防ぐことができる
 * **Close**・**Open**・**Half-Open** の状態をとる
 
 .footnote[
