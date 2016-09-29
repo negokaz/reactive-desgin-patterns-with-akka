@@ -1094,48 +1094,53 @@ Close と Open がややこしいので、解説しておきます
 ]
 
 ---
-exclude: true
 
 ## 障害の連鎖を食い止める
 
-.center.float.bottom-10[
-.height-9[![](r/img/cascade_failure.1.svg)]
+復数のサービスが連携してリクエストを処理している
+
+.float.left-20.bottom-0[
+.height-14[![](r/img/cascade_failure.1.svg)]
 ]
 
 ---
-exclude: true
 
 ## 障害の連鎖を食い止める
 
-.center.float.bottom-10[
-.height-9[![](r/img/cascade_failure.2.svg)]
+あるサービスが何らかの障害で過負荷になって リクエストを処理できなくなった
+
+.float.left-20.bottom-0[
+.height-14[![](r/img/cascade_failure.2.svg)]
 ]
 
 ---
-exclude: true
 
 ## 障害の連鎖を食い止める
 
-.center.float.bottom-10[
-.height-9[![](r/img/cascade_failure.3.svg)]
+そのサービスに依存するサービスにもリクエストが溜まり 負荷が高くなる
+
+.float.left-20.bottom-0[
+.height-14[![](r/img/cascade_failure.3.svg)]
 ]
 
 ---
-exclude: true
 
 ## 障害の連鎖を食い止める
 
-.center.float.bottom-10[
-.height-9[![](r/img/cascade_failure.4.svg)]
+さらにそのサービスに依存するサービスにも... (ry
+
+.float.left-20.bottom-0[
+.height-14[![](r/img/cascade_failure.4.svg)]
 ]
 
 ---
-exclude: true
 
 ## 障害の連鎖を食い止める
 
-.center.float.bottom-10[
-.height-9[![](r/img/cascade_failure.5.svg)]
+Circuit Breaker を使うことによって、この障害の連鎖を食い止めることができる
+
+.float.left-20.bottom-0[
+.height-14[![](r/img/cascade_failure.5.svg)]
 ]
 
 ---
