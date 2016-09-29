@@ -6,6 +6,11 @@
   <link rel="shortcut icon" href="r/favicon.ico">
   <link rel="stylesheet" type="text/css" href="r/light-theme/light-theme.css" />
   <link rel="stylesheet" type="text/css" href="r/tis-theme/tis-theme.css" />
+  <style type="text/css">
+    .remark-code {
+      font-size: 1rem;
+    }
+  </style>
 </head>
 <body>
 
@@ -418,12 +423,16 @@ Service b を呼び出した後、そのスレッドはレスポンスを待ち�
 * 同期/ブロッキング API
 
 ```java
-Response a = serviceA.request();
 Response b = serviceB.request();
+Response a = serviceA.request();
 
 Integer responseSize = a.size + b.size;
 doSomething(responseSize);
 ```
+
+---
+
+## 非同期/ノンブロッキング API の<br>デメリット
 
 * 非同期/ノンブロッキング API
 
@@ -432,7 +441,8 @@ CompletionStage<Response> a = serviceA.request();
 CompletionStage<Response> b = serviceB.request();
 
 CompletionStage<Integer> responseSize =
-  a.thenCombine(b, (resA, resB) -> resA.size + resB.size));
+  a.thenCombine(b,
+      (resA, resB) -> resA.size + resB.size));
 responseSize.thenAccept(size -> doSomething(size));
 ```
 
@@ -449,7 +459,7 @@ responseSize.thenAccept(size -> doSomething(size));
 
 ## 非同期/ノンブロッキング API の<br>デメリット
 
-* コード量が増える
+* 非同期 API の扱いに慣れるのに学習コストが必要
 * スレッドセーフな実装になるよう注意する必要がある
 
 ???
@@ -579,10 +589,59 @@ Entity の状態は、メモリ上に保持され DB にバックアップされ
 ## Sharding？
 
 .float-top-15[
-* Node に障害が起きたら
+* Shard は Node ごとに ShardRegion というグループになる
 ]
 
 .height-18[![](r/img/sharding-architecture.4.svg)]
+
+???
+
+
+---
+
+## Sharding？
+
+.float-top-15[
+* 各 Entity を ID で識別できるようにしておくと
+]
+
+.height-18[![](r/img/sharding-architecture.5.svg)]
+
+???
+
+---
+
+## Sharding？
+
+.float-top-15[
+* メッセージで ID を指定しておけば、どの ShardRegion に送ってもその ID を持つ Entity に届く
+]
+
+.height-18[![](r/img/sharding-architecture.6.svg)]
+
+???
+
+---
+
+## Sharding？
+
+.float-top-15[
+* もしも…
+]
+
+.height-18[![](r/img/sharding-architecture.8.svg)]
+
+???
+
+---
+
+## Sharding？
+
+.float-top-15[
+* Node に障害が起きたら
+]
+
+.height-18[![](r/img/sharding-architecture.9.svg)]
 
 ???
 もし、Shard が存在しているノードに障害が起きたら
@@ -595,7 +654,7 @@ Entity の状態は、メモリ上に保持され DB にバックアップされ
 * 別のノードに Shard が移動 (復元) する
 ]
 
-.height-18[![](r/img/sharding-architecture.5.svg)]
+.height-18[![](r/img/sharding-architecture.10.svg)]
 
 ???
 別のノードに Shard が移動します。
@@ -608,7 +667,7 @@ Entity の状態は、メモリ上に保持され DB にバックアップされ
 * 新しいノードを追加すると
 ]
 
-.height-18[![](r/img/sharding-architecture.6.svg)]
+.height-18[![](r/img/sharding-architecture.11.svg)]
 
 ???
 新しくノードを追加すると
@@ -618,10 +677,10 @@ Entity の状態は、メモリ上に保持され DB にバックアップされ
 ## Sharding？
 
 .float-top-15[
-* シャードが分散(リバランス)され、元の状態に戻る
+* シャードが分散(リバランス)される
 ]
 
-.height-18[![](r/img/sharding-architecture.7.svg)]
+.height-18[![](r/img/sharding-architecture.12.svg)]
 
 ???
 リバランスという処理が行われて、再び元の状態に戻ります。
