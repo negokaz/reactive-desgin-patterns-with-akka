@@ -486,11 +486,11 @@ Lagom では、Reactive を達成するために、外部サービスの呼び�
 ## Lagom を使わずに実現する方法
 
 * HTTP
-  * [Play - WS API](https://www.playframework.com/documentation/2.5.x/ScalaWS)
-  * [Gigahorse](http://eed3si9n.com/gigahorse/)
+  * [Play - WS API](https://www.playframework.com/documentation/2.5.x/ScalaWS) (Java/Scala)
+  * [Gigahorse](http://eed3si9n.com/gigahorse/) (Scala)
 * DB
   * [Java Driver for Apache Cassandra](https://github.com/datastax/java-driver)
-  * [postgresql-async & mysql-async](https://github.com/mauricio/postgresql-async)
+  * [postgresql-async & mysql-async](https://github.com/mauricio/postgresql-async) (Java)
 
 ???
 Lagom 以外で、外部サービスの呼び出しやDBアクセスを非同期/ノンブロッキングにするには、どうすれば良いかというと、ここに挙げたような方法があります。
@@ -712,7 +712,7 @@ Entity の状態は、メモリ上に保持され DB にバックアップされ
 
 ## Lagom を使わずに実現する方法
 
-* [Akka - Cluster Sharding](http://doc.akka.io/docs/akka/current/scala/cluster-sharding.html)
+* [Akka - Cluster Sharding](http://doc.akka.io/docs/akka/current/scala/cluster-sharding.html) (Java/Scala)
 
 ???
 Lagom 以外で実現する方法としては、Akka の Cluster Sharding と呼ばれるモジュールを使う方法があります。
@@ -909,7 +909,7 @@ CQRS というのは、Command Query Responsibility Segregation の頭文字を�
 
 ## Lagom を使わずに実現する方法
 
-* [Akka Persistence](http://doc.akka.io/docs/akka/current/scala/persistence.html) + [Akka Persistence Query](http://doc.akka.io/docs/akka/current/scala/persistence-query.html)
+* [Akka Persistence](http://doc.akka.io/docs/akka/current/scala/persistence.html) + [Akka Persistence Query](http://doc.akka.io/docs/akka/current/scala/persistence-query.html) (Java/Scala)
 
 ???
 この Event Sourcing と CQRS をLagom以外で実現する方法としては、…
@@ -1216,8 +1216,8 @@ Lagom では、
 
 ## Lagom を使わずに実現する方法
 
-* [Netflix - Hystrix](https://github.com/Netflix/Hystrix)
-* [Akka - Circuit Breaker](http://doc.akka.io/docs/akka/current/common/circuitbreaker.html)
+* [Netflix - Hystrix](https://github.com/Netflix/Hystrix) (Java)
+* [Akka - Circuit Breaker](http://doc.akka.io/docs/akka/current/common/circuitbreaker.html) (Java/Scala)
 
 ???
 Lagom 以外で実現するには
