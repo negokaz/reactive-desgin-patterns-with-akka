@@ -524,7 +524,7 @@ Sharding というのは、負荷分散手法の一つです。
 
 ## Entity？
 
-* Entity がサービスの状態を更新するためのロジックと、サービスの現在の状態を分散して持つ
+* Entity がサービスの現在の状態を分散して持つ
 * 状態は オンメモリで管理され、<br>DB にバックアップされる
 * 状態を DB に問い合わせる必要がない
     * レイテンシを抑えられる
@@ -599,6 +599,7 @@ Entity の状態は、メモリ上に保持され DB にバックアップされ
 
 ???
 
+(本文)
 
 ---
 
@@ -611,6 +612,8 @@ Entity の状態は、メモリ上に保持され DB にバックアップされ
 .height-18[![](r/img/sharding-architecture.5.svg)]
 
 ???
+
+(本文)
 
 ---
 
@@ -840,6 +843,11 @@ Entity が存在しているノードに障害が起きたりして、メモリ�
 .height-10[![](r/img/command-and-query.svg)]
 ]
 
+???
+CQRS というのは、Command Query Responsibility Segregation の頭文字をとったもので、
+
+(本文)
+
 ---
 
 ## CQRS？
@@ -856,7 +864,6 @@ Entity が存在しているノードに障害が起きたりして、メモリ�
 ]
 
 ???
-CQRS というのは、Command Query Responsibility Segregation の頭文字をとったもので、
 
 (本文)
 
@@ -1030,6 +1037,10 @@ Close と Open がややこしいので、解説しておきます
 .height-9[![](r/img/cb-behavior.4.svg)]
 ]
 
+???
+
+(本文)
+
 ---
 
 ## Circuit Breaker の動き
@@ -1040,6 +1051,10 @@ Close と Open がややこしいので、解説しておきます
 .height-9[![](r/img/cb-behavior.5.svg)]
 ]
 
+???
+
+(本文)
+
 ---
 
 ## Circuit Breaker の動き
@@ -1049,6 +1064,10 @@ Close と Open がややこしいので、解説しておきます
 .center.float.bottom-10[
 .height-9[![](r/img/cb-behavior.6.svg)]
 ]
+
+???
+
+(本文)
 
 ---
 
@@ -1061,6 +1080,10 @@ Close と Open がややこしいので、解説しておきます
 .height-9[![](r/img/cb-behavior.7.svg)]
 ]
 
+???
+
+(本文)
+
 ---
 
 ## Circuit Breaker の動き
@@ -1072,6 +1095,10 @@ Close と Open がややこしいので、解説しておきます
 .height-9[![](r/img/cb-behavior.8.svg)]
 ]
 
+???
+
+(本文)
+
 ---
 
 ## Circuit Breaker の動き
@@ -1082,6 +1109,10 @@ Close と Open がややこしいので、解説しておきます
 .center.float.bottom-10[
 .height-9[![](r/img/cb-behavior.9.svg)]
 ]
+
+???
+
+(本文)
 
 ---
 
@@ -1095,7 +1126,7 @@ Close と Open がややこしいので、解説しておきます
 
 ???
 
-このように、外部サービスに障害が起きているときに、早くエラーの応答を返せるようになるというメリットがあるのですが、もう一つメリットがあります。
+このように、外部サービスに障害が起きているときに、タイムアウトを待たずに早くエラーの応答を返せるようになるというメリットがあるのですが、もう一つメリットがあります。
 
 ---
 
@@ -1120,6 +1151,10 @@ Close と Open がややこしいので、解説しておきます
 .height-14[![](r/img/cascade_failure.2.svg)]
 ]
 
+???
+
+(本文)
+
 ---
 
 ## 障害の連鎖を食い止める
@@ -1129,6 +1164,10 @@ Close と Open がややこしいので、解説しておきます
 .float.left-20.bottom-0[
 .height-14[![](r/img/cascade_failure.3.svg)]
 ]
+
+???
+
+(本文)
 
 ---
 
@@ -1140,6 +1179,10 @@ Close と Open がややこしいので、解説しておきます
 .height-14[![](r/img/cascade_failure.4.svg)]
 ]
 
+???
+
+(本文)
+
 ---
 
 ## 障害の連鎖を食い止める
@@ -1149,6 +1192,10 @@ Circuit Breaker を使うことによって、この障害の連鎖を食い止�
 .float.left-20.bottom-0[
 .height-14[![](r/img/cascade_failure.5.svg)]
 ]
+
+???
+
+(本文)
 
 ---
 
