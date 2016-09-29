@@ -249,7 +249,7 @@ MSAの開発で汎用的に使えるデザインパターンに近い
 -----
 (本文)
 
-Lagom を使わずとも、ここに挙げたパターンを使いこなせるように
+今後、MSAの開発をするときに、ここに挙げたパターンを使いこなせるように
 
 ---
 
@@ -430,6 +430,10 @@ Integer responseSize = a.size + b.size;
 doSomething(responseSize);
 ```
 
+???
+ただ、非同期/ノンブロッキング の API を使うときにはデメリットがあります。
+とある処理をするコードを書いてみました。
+
 ---
 
 ## 非同期/ノンブロッキング API の<br>デメリット
@@ -451,9 +455,7 @@ responseSize.thenAccept(size -> doSomething(size));
 ]
 
 ???
-ただ、非同期/ノンブロッキング の API を使うときにはデメリットがあります。
-ここには同期的なAPIのコードと非同期なAPIのコードの例を書きました。
-両者では全く同じことをやっています。
+両者では同じことをやっています。
 
 ---
 
@@ -463,7 +465,8 @@ responseSize.thenAccept(size -> doSomething(size));
 * スレッドセーフな実装になるよう注意する必要がある
 
 ???
-これを見てわかるとおり、非同期の API ではコード量が多くなります。
+これを見てわかるとおり、非同期の API では、少し特殊な書き方になります。
+こういった書き方に慣れる必要があります。
 
 また、スレッドセーフになるように注意して実装する必要があります。
 
@@ -925,6 +928,7 @@ CQRS というのは、Command Query Responsibility Segregation の頭文字を�
 外部サービスの障害時、即座にエラーの応答を返す仕組み
 * リトライによるネットワーク帯域の無駄遣いが減る
 * レイテンシを低く抑えられる
+* 障害の連鎖を抑えることができる
 * **Close**・**Open**・**Half-Open** の状態をとる
 
 .footnote[
@@ -988,6 +992,9 @@ Close と Open がややこしいので、解説しておきます
 .height-9[![](r/img/cb-behavior.1.svg)]
 ]
 
+???
+もう少し具体的に見てみます。
+
 ---
 
 ## Circuit Breaker の動き
@@ -1007,6 +1014,11 @@ Close と Open がややこしいので、解説しておきます
 .center.float.bottom-10[
 .height-9[![](r/img/cb-behavior.3.svg)]
 ]
+
+???
+
+* ネットワークの障害でリクエストが到達できなくなった
+* 相手のサービスが過負荷でリクエストを捌けなくなっている
 
 ---
 
@@ -1079,6 +1091,51 @@ Close と Open がややこしいので、解説しておきます
 
 .center.float.bottom-10[
 .height-9[![](r/img/cb-behavior.10.svg)]
+]
+
+---
+exclude: true
+
+## 障害の連鎖を食い止める
+
+.center.float.bottom-10[
+.height-9[![](r/img/cascade_failure.1.svg)]
+]
+
+---
+exclude: true
+
+## 障害の連鎖を食い止める
+
+.center.float.bottom-10[
+.height-9[![](r/img/cascade_failure.2.svg)]
+]
+
+---
+exclude: true
+
+## 障害の連鎖を食い止める
+
+.center.float.bottom-10[
+.height-9[![](r/img/cascade_failure.3.svg)]
+]
+
+---
+exclude: true
+
+## 障害の連鎖を食い止める
+
+.center.float.bottom-10[
+.height-9[![](r/img/cascade_failure.4.svg)]
+]
+
+---
+exclude: true
+
+## 障害の連鎖を食い止める
+
+.center.float.bottom-10[
+.height-9[![](r/img/cascade_failure.5.svg)]
 ]
 
 ---
