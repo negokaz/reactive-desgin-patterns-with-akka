@@ -29,10 +29,6 @@ class: center, middle
 # Akka を用いた<br>リアクティブシステムの<br>設計パターン
 ]
 
-???
-Lagom で学ぶ Reactive Microservices Architecture というテーマで発表します。
-よろしくお願いします。
-
 ---
 
 ## 私は何者？
@@ -45,169 +41,16 @@ Lagom で学ぶ Reactive Microservices Architecture というテーマで発表�
 
 .with-twitter-icon[[@negokaz](https://twitter.com/negokaz)] .with-github-icon[[negokaz](https://github.com/negokaz)]
 
-???
-
-私たちは Reactive System の推進をミッションとしていて、
-Lightbend Reactive Platform つまり Scala や Akka、Play といった技術の
-検証やコンサルを おこなっています。
-
 ---
 
 ## 今日話したいこと
 
-* Microservices の開発に役立つかもしれない <br> Lagom のデザインについて
-* コードはあまり出てきません
-
-???
-(本文)
+* リアクティブシステムの設計パターンについて
+* 特に Akka が得意とするパターンをピックアップ
 
 ---
 
-## Lagom とは？
-
-.height-3.center[![](r/img/lagom_logo.svg)]
-
-* Lightbend社が3月にリリースした<br>Microservices Architecture 向けフレームワーク
-* 内部 API は Java
-* コンセプトは **Reactive** *Microservices Architecture*
-
-.footnote[
-[https://www.lightbend.com/lagom](https://www.lightbend.com/lagom)
-
-[Reactive Microservices Architecture (O’Reilly)](http://www.oreilly.com/programming/free/reactive-microservices-architecture.html)
-]
-
-???
-まず、Lagom の紹介をしておきます
-
-* Reactive Microservices Architecture: 造語で、Lightbend社のCTOが書いた本に出てくる言葉
-
----
-
-## Microservices Architecture？
-
-* 2014年3月に ThoughtWorks社 の Martin Fowler によって提唱された
-* 小さいサービスを組み合わせて 一つのアプリケーションを構築するスタイルのこと
-* システムを細かく分割することにより .strong[様々な利点]が得られる
-* (長いので以降は *MSA* と略します)
-
-???
-マイクロサービスアーキテクチャのおさらい
-
-(本文)
----
-
-## MSAの利点
-
-* 異なるチームで独立して開発できる
-    * コミュニケーションコストを抑えることができる
-* サービスごとに異なる技術が使える
-    * サービスの特性に合った技術を採用できる
-* デプロイの影響範囲を小さくできる
-    * 新機能や修正を早くリリースできる
-* 障害を一部のサービスに留めることができる
-    * 全体の可用性を高めることができる
-
-???
-どのような利点が得られるのでしょうか？
-
-(本文)
----
-
-## MSA化の注意点
-
-???
-ただ、MSAにするにあたり注意すべきことがあります
-
---
-
-* MSAにすると **.big[分散システム]** になる
-
-.center[
-.height-10[![](r/img/computer_p2p.png)]
-]
-
-???
-MASにすると分散システムになるということです
-
----
-
-## 分散コンピューティングの落とし穴
-
-分散システムを開発するときに<br>想定してしまいがちな*誤った*前提
-
-* ネットワークは信頼できる。
-* 帯域幅は無限である。
-* レイテンシはゼロである。
-* トランスポートコストはゼロである。
-
-.small[(一部抜粋)]
-
-.float.bottom-15.right-5[
-.height-8[![](r/img/otoshiana.png)]
-]
-
-.footnote[
-[Wikipedia - 分散コンピューティングの落とし穴](https://ja.wikipedia.org/wiki/%E5%88%86%E6%95%A3%E3%82%B3%E3%83%B3%E3%83%94%E3%83%A5%E3%83%BC%E3%83%86%E3%82%A3%E3%83%B3%E3%82%B0%E3%81%AE%E8%90%BD%E3%81%A8%E3%81%97%E7%A9%B4)
-]
-
-???
-なぜ注意しないといけないのか、というと「分散コンピューティングの落とし穴」という話があります
-
----
-
-## つまり
-
-モノリシックなシステムを単純に分割するだけでは
-
-* 障害点が増えて*可用性が下がる*
-* オーバーヘッドが増えて*レイテンシが大きくなる*
-
-大規模になるほど、この問題が目立ってくる
-
-.float.bottom-10.right-3[
-.height-7[![](r/img/atama_kakaeru_man.png)]
-]
-
-???
-つまり
-
-(本文)
-
---
-
-.with-arrow[この問題を最小化したい]
-
-???
------
-で、この問題を最小化するにはどうすればよいのでしょうか。
-
----
-
-## この問題に立ち向かうのが Lagom
-
-* Lagom は **Reactive** な Microservices を目指すフレームワーク
-* Reactive を達成するための様々な道具を備えている
-
-その道具を用いることで
-
-* 可用性
-* 応答速度
-* (さらにもう一歩進んで) スケーラビリティ
-
-を上げることができる
-
-.float.bottom-7.right-3[
-.height-9[![](r/img/yuusya_game.png)]
-]
-
-???
-この問題に立ち向かっているのが、Lagom です。
-
-(本文)
----
-
-## Reactive のおさらい
+## リアクティブシステムのおさらい
 
 .center[
 .with-border-frame.height-15[![](http://image.slidesharecdn.com/reactivearchitecture20160218-160218033020/95/devsumi-29-638.jpg?cb=1455774616)]
@@ -217,66 +60,21 @@ MASにすると分散システムになるということです
 [リアクティブ・アーキテクチャ ～大規模サービスにおける必要性と課題〜](http://www.slideshare.net/okapies/reactive-architecture-20160218-58403521)
 ]
 
-???
-ここで、Reactive という言葉のおさらいをしておきます。
-リアクティブシステムはシステムを形容する言葉です。
+---
 
-リアクティブシステムがもたらす価値は「即応性」で
+## リアクティブシステムの設計パターン
 
-* 即応性を実現するためには、弾力性とレジリエンスも必要
-* その全ては非同期のメッセージパッシングによってもたらされる
+- 非同期/ノンブロッキング
+- Timeout
+- Circuit Breaker
+- メッセージパッシング
+- バックプレッシャー
+- Sharding によるステートフルなアーキテクチャ
+- Event Sourcing + CQRS
 
 ---
 
-## Lagom が Reactive を達成する道具
-
-* 非同期/ノンブロッキングなAPI
-* Sharding によるステートフルなアーキテクチャ
-* 分散型の永続化機構
-  * Event Sourcing + CQRS
-* Circuit Breaker
-
-???
-では、もう少し具体的に Lagom はどうやってこの Reactive を実現しているのかを見ていきましょう。
-
-Lagom はここに挙げたようなものを備えています。
-
---
-
-これらは、Lagom でしか適用できないというものではない
-MSAの開発で汎用的に使えるデザインパターンに近い
-
-???
------
-(本文)
-
-今後、MSAの開発をするときに、ここに挙げたパターンを使いこなせるように
-
----
-
-## Lagom を見習ってみよう！
-
-.center[
-![](r/img/lagom-teacher.svg)
-]
-
-???
-Lagom を見習ってみよう！というのが本日のメインテーマです。
-
----
-
-## Lagom が Reactive を達成する道具
-
-* **.with-checkbox-off[非同期/ノンブロッキングなAPI]**
-* .with-checkbox-off[Sharding によるステートフルなアーキテクチャ]
-* .with-checkbox-off[分散型の永続化機構]
-  * Event Sourcing + CQRS
-* .with-checkbox-off[Circuit Breaker]
-
-???
-では、それぞれ具体的に見ていきましょう。
-
-まず、「非同期/ノンブロッキングなAPI」です。
+## 非同期/ノンブロッキング
 
 ---
 
@@ -285,12 +83,6 @@ Lagom を見習ってみよう！というのが本日のメインテーマで�
 * レイテンシを小さくする
 * 外部サービスの障害時に影響を受けにくくする
 
-???
-なぜ、「非同期/ノンブロッキングな」APIが必要なのでしょうか？
-
-なぜかというと…
-
-(本文)
 ---
 
 ## 同期的にAPIを呼び出す
@@ -301,14 +93,6 @@ Lagom を見習ってみよう！というのが本日のメインテーマで�
 .width-23[![](r/img/api-call.blocking.svg)]
 ]
 
-???
-詳しく見ていきましょう。
-
-とある API を実装することを考えてみます。
-この API の中では 5 つの外部 API を同期的に呼び出します。
-それぞれの API は 100ms で応答を返します。
-
-このとき、全ての API を呼び出すのに合計で 500ms かかることになります。
 ---
 
 ## 非同期にAPIを呼び出す
@@ -319,20 +103,9 @@ Lagom を見習ってみよう！というのが本日のメインテーマで�
 .width-23[![](r/img/api-call.non-blocking.svg)]
 ]
 
-???
-では、外部 API の呼び出しを非同期にするとどうなるでしょうか。
-
-それぞれの外部APIに同時にリクエストを投げて、100ms 後にそれぞれのAPIからの応答を受け取ります。
-
---
-
 .float-bottom-5[
 .with-arrow.glass[1/5 の時間で応答を返せる！]
 ]
-
-???
------
-つまり、1/5 の時間で応答を返せるということです。
 
 ---
 
@@ -344,16 +117,6 @@ Lagom を見習ってみよう！というのが本日のメインテーマで�
 .width-22[![](r/img/thread.blocking.svg)]
 ]
 
-???
-次に、スレッドの動きを見ていきましょう。
-
-Service a から Service b にリクエストを送ることを考えます。
-Service a は同期的に Service b を呼び出しています。
-
-Service b を呼び出した後、そのスレッドはレスポンスを待ち続けます。
-その間、そのスレッドでは他の処理ができません。
-スレッドがブロックしている状態です。
-
 ---
 
 ## ノンブロッキングでタスクを実行する
@@ -363,14 +126,6 @@ Service b を呼び出した後、そのスレッドはレスポンスを待ち�
 .center[
 .width-22[![](r/img/thread.non-blocking.svg)]
 ]
-
-???
-
-非同期ノンブロッキングで処理をする場合はどうなるでしょうか。
-
-この場合は、Service b を呼び出したスレッドはリクエストに対するレスポンスを待たなくなります。
-つまり、レスポンスが返ってくるまでの間、他の処理ができます。
-これにより、より効率的にリソースを使えるようになります。
 
 ---
 
@@ -382,13 +137,6 @@ Service b を呼び出した後、そのスレッドはレスポンスを待ち�
 .width-22[![](r/img/thread.fail-blocking.1.svg)]
 ]
 
-???
-ノンブロッキングの利点はそれだけではありません。
-何らかの障害が起きて Service b からの応答が受け取れなかったときのことを考えてみます。
-
-スレッドがブロックするようになっていると、応答が返ってこないのでずっとブロックすることになります。
-そうなると、新たに Service b を呼び出す処理が呼ばれると、他のスレッドを使って呼び出す必要がでてきます。
-
 ---
 
 ## ブロックしてタスクを実行する
@@ -399,11 +147,6 @@ Service b を呼び出した後、そのスレッドはレスポンスを待ち�
 .width-22[![](r/img/thread.fail-blocking.2.svg)]
 ]
 
-???
-こうやって、たくさん Service b を呼び出す処理が呼ばれたとすると、このようにスレッドがどんどん消費されていきます。
-
-最終的にはメモリを食い潰してそのサービスが動いているホストのパフォーマンスを劣化させます。
-
 ---
 
 ## ノンブロッキングでタスクを実行する
@@ -413,9 +156,6 @@ Service b を呼び出した後、そのスレッドはレスポンスを待ち�
 .center[
 .width-22[![](r/img/thread.fail-non-blocking.svg)]
 ]
-
-???
-ノンブロッキングにしておくと、相手が応答しなかったとしても、スレッドがブロックしないので他の処理を実行でき、スレッドを大量に消費するといったことは起きません。
 
 ---
 
@@ -430,10 +170,6 @@ Response a = serviceA.request();
 Integer responseSize = a.size + b.size;
 doSomething(responseSize);
 ```
-
-???
-ただ、非同期/ノンブロッキング の API を使うときにはデメリットがあります。
-とある処理をするコードを書いてみました。
 
 ---
 
@@ -455,9 +191,6 @@ responseSize.thenAccept(size -> doSomething(size));
 [Java SE 8 API - CompletionStage&amp;lt;T&amp;gt;](https://docs.oracle.com/javase/jp/8/docs/api/java/util/concurrent/CompletionStage.html)
 ]
 
-???
-両者では同じことをやっています。
-
 ---
 
 ## 非同期/ノンブロッキング API の<br>デメリット
@@ -465,26 +198,9 @@ responseSize.thenAccept(size -> doSomething(size));
 * 非同期 API の扱いに慣れるのに学習コストが必要
 * スレッドセーフな実装になるよう注意する必要がある
 
-???
-これを見てわかるとおり、非同期の API では、少し特殊な書き方になります。
-こういった書き方に慣れる必要があります。
-
-また、スレッドセーフになるように注意して実装する必要があります。
-
 ---
 
-
-## Lagom では
-
-* 外部サービスの呼び出しやDBの操作をするようなAPIは 全て非同期/ノンブロッキング
-
-???
-
-Lagom では、Reactive を達成するために、外部サービスの呼び出しやDBにアクセスする部分のAPIは全て非同期/ノンブロッキングで実装するようになっています。
-
----
-
-## Lagom を使わずに実現する方法
+## Akka を使わずに実現する方法
 
 * HTTP
   * [Play - WS API](https://www.playframework.com/documentation/2.5.x/ScalaWS) (Java/Scala)
@@ -493,21 +209,9 @@ Lagom では、Reactive を達成するために、外部サービスの呼び�
   * [Java Driver for Apache Cassandra](https://github.com/datastax/java-driver)
   * [postgresql-async & mysql-async](https://github.com/mauricio/postgresql-async) (Java)
 
-???
-Lagom 以外で、外部サービスの呼び出しやDBアクセスを非同期/ノンブロッキングにするには、どうすれば良いかというと、ここに挙げたような方法があります。
-
 ---
 
-## Lagom が Reactive を達成する道具
-
-* .with-checkbox-on[非同期/ノンブロッキングなAPI]
-* **.with-checkbox-off[Sharding によるステートフルなアーキテクチャ]**
-* .with-checkbox-off[分散型の永続化機構]
-  * Event Sourcing + CQRS
-* .with-checkbox-off[Circuit Breaker]
-
-???
-次に、Sharding によるステートフルなアーキテクチャについて見ていきます。
+## Cluster Sharding
 
 ---
 
@@ -517,9 +221,6 @@ Lagom 以外で、外部サービスの呼び出しやDBアクセスを非同期
 * 単一障害点がないため高い可用性を実現できる
 * Lagomでは単体のサービスをスケールするのに利用される
 * **Entity** を分散させて負荷を分散する
-
-???
-Sharding というのは、負荷分散手法の一つです。
 
 ---
 
@@ -532,16 +233,6 @@ Sharding というのは、負荷分散手法の一つです。
 * Entity には*位置透過性*があり、ノード間を移動できる
     * ノードやネットワークに障害があっても復旧できる
 
-???
-Lagom では Entity と呼ばれるものがサービスの状態をどのように更新するかというロジックと、
-サービスの現在の状態を分散して持ちます。
-
-Entity の状態は、メモリ上に保持され DB にバックアップされます。
-
-状態がメモリ上にあるため、状態を参照したいときは Entity のプロパティを直接参照すればよく、レイテンシが抑えられます。
-
-また、Entity は位置透過性という性質を持つように作られており、物理的なノード間を移動できるようになっています。
-これによって、Entity が居るノードに障害が起きたとしても、自動で復旧できるようになっています。
 ---
 
 ## 例えば？
@@ -555,11 +246,6 @@ Entity の状態は、メモリ上に保持され DB にバックアップされ
 .height-8[![](r/img/jinmyaku.png)]
 ]
 
-???
-ちょっと Entity のイメージが付きづらいと思うので、具体例をあげます。
-
-(本文)
-
 ---
 
 ## Sharding？
@@ -569,11 +255,6 @@ Entity の状態は、メモリ上に保持され DB にバックアップされ
 ]
 
 .height-18[![](r/img/sharding-architecture.2.svg)]
-
-???
-では、この Entity が Sharding でどのように振る舞うのかを見ていきます。
-
-まず、Entity は Shard と呼ばれるグループに分けられます。
 
 ---
 
@@ -585,9 +266,6 @@ Entity の状態は、メモリ上に保持され DB にバックアップされ
 
 .height-18[![](r/img/sharding-architecture.3.svg)]
 
-???
-この Shard 単位で物理的なノードに配置されます。
-
 ---
 
 ## Sharding？
@@ -597,10 +275,6 @@ Entity の状態は、メモリ上に保持され DB にバックアップされ
 ]
 
 .height-18[![](r/img/sharding-architecture.4.svg)]
-
-???
-
-(本文)
 
 ---
 
@@ -612,10 +286,6 @@ Entity の状態は、メモリ上に保持され DB にバックアップされ
 
 .height-18[![](r/img/sharding-architecture.5.svg)]
 
-???
-
-(本文)
-
 ---
 
 ## Sharding？
@@ -625,8 +295,6 @@ Entity の状態は、メモリ上に保持され DB にバックアップされ
 ]
 
 .height-18[![](r/img/sharding-architecture.6.svg)]
-
-???
 
 ---
 
@@ -638,8 +306,6 @@ Entity の状態は、メモリ上に保持され DB にバックアップされ
 
 .height-18[![](r/img/sharding-architecture.8.svg)]
 
-???
-
 ---
 
 ## Sharding？
@@ -649,9 +315,6 @@ Entity の状態は、メモリ上に保持され DB にバックアップされ
 ]
 
 .height-18[![](r/img/sharding-architecture.9.svg)]
-
-???
-もし、Shard が存在しているノードに障害が起きたら
 
 ---
 
@@ -663,9 +326,6 @@ Entity の状態は、メモリ上に保持され DB にバックアップされ
 
 .height-18[![](r/img/sharding-architecture.10.svg)]
 
-???
-別のノードに Shard が移動します。
-
 ---
 
 ## Sharding？
@@ -675,9 +335,6 @@ Entity の状態は、メモリ上に保持され DB にバックアップされ
 ]
 
 .height-18[![](r/img/sharding-architecture.11.svg)]
-
-???
-新しくノードを追加すると
 
 ---
 
@@ -689,58 +346,19 @@ Entity の状態は、メモリ上に保持され DB にバックアップされ
 
 .height-18[![](r/img/sharding-architecture.12.svg)]
 
-???
-リバランスという処理が行われて、再び元の状態に戻ります。
+---
+
+## Akka を使わずに実現する方法
 
 ---
 
-## Lagom では
-
-この仕組みは Lagom によって提供される
-
-???
-この仕組みは Lagom によって提供されるので、実際にアプリを作るときはほとんど意識する必要がありません。
-
---
-
-.with-arrow[私たちは Entity の実装に集中できる]
-
-???
------
-なので、私たちは Entity のロジックの実装に集中することができます。
-
----
-
-## Lagom を使わずに実現する方法
-
-* [Akka - Cluster Sharding](http://doc.akka.io/docs/akka/current/scala/cluster-sharding.html) (Java/Scala)
-
-???
-Lagom 以外で実現する方法としては、Akka の Cluster Sharding と呼ばれるモジュールを使う方法があります。
-
-実は、Lagom の中でもこれが使われています。
-
----
-
-## Lagom が Reactive を達成する道具
-
-* .with-checkbox-on[非同期/ノンブロッキングなAPI]
-* .with-checkbox-on[Sharding によるステートフルなアーキテクチャ]
-* **.with-checkbox-off[分散型の永続化機構]**
-  * **Event Sourcing + CQRS**
-* .with-checkbox-off[Circuit Breaker]
-
-???
-次は、分散型の永続化機構である Event Sourcing と CQRS について見ていきます
+## Event Sourcing + CQRS
 
 ---
 
 ## 分散型の永続化機構
 
 Lagom は .strong[Event Sourcing] と .strong[CQRS] による永続化のしくみ<br>を備えており、データの読み込みと書き込みの両方を<br>スケールできるようになっている
-
-???
-(本文)
 
 ---
 
@@ -749,36 +367,17 @@ Lagom は .strong[Event Sourcing] と .strong[CQRS] による永続化のしく�
 * システムの中で起きた**イベント**を永続化する
 * イベントをデータストアに INSERT していく
 
-???
-Event Sourcing とは…
-
-(本文)
-
-どういうことかというと…
-
 --
 
 .as-underlay.without-margin[
 .height-13[![](r/img/event-sourcing.1.svg)]
 ]
-???
------
-例えば、銀行口座のシステムを考えてみましょう。
-一つの銀行口座が Entity になります。
-まず、私が銀行で口座の開設の申込をすると、行員の担当者がシステム上に口座を作ります。
-
-このとき、口座番号 10 の口座を開設 というイベントがシステム内で発生します。
-口座の Entity は状態として、口座番号と、現在の残高を持ちます。
 
 --
 
 .as-underlay.without-margin[
 .height-13[![](r/img/event-sourcing.2.svg)]
 ]
-
-???
------
-(図)
 
 --
 
@@ -810,12 +409,6 @@ Event Sourcing とは…
         * 読み込みをスケールしやすい
         * データの耐久性を高くできる
 
-???
-
-Entity が存在しているノードに障害が起きたりして、メモリ上から Entity の状態がなくなってしまった場合は…
-
-ここで重要なのが、イベントが不変であるという性質です。
-
 ---
 
 ## Event Sourcing？
@@ -823,15 +416,8 @@ Entity が存在しているノードに障害が起きたりして、メモリ�
 * デメリット
   * データの集計にコストがかかる
 
-???
-ただ、Event Sourcing にもデメリットがあります。
-
 --
 .with-arrow[**CQRS** で解決できる]
-
-???
-それは、データの集計にコストがかかるという点です。
-このデメリットは CQRS というパターンを使うと、解決できます。
 
 ---
 
@@ -843,11 +429,6 @@ Entity が存在しているノードに障害が起きたりして、メモリ�
 .center[
 .height-10[![](r/img/command-and-query.svg)]
 ]
-
-???
-CQRS というのは、Command Query Responsibility Segregation の頭文字をとったもので、
-
-(本文)
 
 ---
 
@@ -864,12 +445,6 @@ CQRS というのは、Command Query Responsibility Segregation の頭文字を�
 .with-arrow[Command-Side に Event Sourcing を使い<br>Query-Side に集計しやすい形で永続化する]
 ]
 
-???
-
-(本文)
-
-そうすることで、集計にかかるコストを低く抑えることができます。
-
 ---
 
 ## CQRS？
@@ -877,16 +452,6 @@ CQRS というのは、Command Query Responsibility Segregation の頭文字を�
 .center[
 .height-16[![](r/img/es-and-cqrs.svg)]
 ]
-
-???
-もう少し具体的に図で見ていきます。
-
-* API Call (POST/PUT/DELETE)
-* Entity
-* EventStore
-* EventProcessor
-* QueryStore
-* API Call (GET)
 
 ---
 
@@ -899,35 +464,13 @@ CQRS というのは、Command Query Responsibility Segregation の頭文字を�
 * Entity をまたがる集計などを行うのに使える
     * 例) その日の振込金額の合計
 
-???
-この CQRS にもデメリットがあります。
+---
 
-(本文)
-
-どういうユースケースに使えるかというと、Entity をまたがる集計などを行う
+## Akka を使わずに実現する方法
 
 ---
 
-## Lagom を使わずに実現する方法
-
-* [Akka Persistence](http://doc.akka.io/docs/akka/current/scala/persistence.html) + [Akka Persistence Query](http://doc.akka.io/docs/akka/current/scala/persistence-query.html) (Java/Scala)
-
-???
-この Event Sourcing と CQRS をLagom以外で実現する方法としては、…
-
----
-
-## Lagom が Reactive を達成する道具
-
-* .with-checkbox-on[非同期/ノンブロッキングなAPI]
-* .with-checkbox-on[Sharding によるステートフルなアーキテクチャ]
-* .with-checkbox-on[分散型の永続化機構]
-  * Event Sourcing + CQRS
-* **.with-checkbox-off[Circuit Breaker]**
-
-???
-最後に Circuit Breaker を見ていきます。
-
+## Circuit Breaker
 
 ---
 
@@ -943,11 +486,6 @@ CQRS というのは、Command Query Responsibility Segregation の頭文字を�
 引用: [Lagom #Consuming services](http://www.lagomframework.com/documentation/1.2.x/java/ServiceClients.html#Circuit-Breakers)
 ]
 
-???
-Circuit Breaker とは、
-
-(本文)
-
 ---
 
 ## Open？ Close？
@@ -961,11 +499,6 @@ Circuit Breaker とは、
 
 * **Close**: 回路が**閉じた**状態 = 通信できる
 * **Open**: 回路が**開いた**状態 = 通信が遮断されている
-
-???
-Close と Open がややこしいので、解説しておきます
-
-(本文)
 
 ---
 
@@ -985,11 +518,6 @@ Close と Open がややこしいので、解説しておきます
 引用: [Lagom #Consuming services](http://www.lagomframework.com/documentation/1.2.x/java/ServiceClients.html#Circuit-Breakers)
 ]
 
-???
-システムの世界の Circuit Breaker はどのように振る舞うかというと、こうなります。
-
-(本文)
-
 ---
 
 ## Circuit Breaker の動き
@@ -999,9 +527,6 @@ Close と Open がややこしいので、解説しておきます
 .center.float.bottom-10[
 .height-9[![](r/img/cb-behavior.1.svg)]
 ]
-
-???
-もう少し具体的に見てみます。
 
 ---
 
@@ -1023,11 +548,6 @@ Close と Open がややこしいので、解説しておきます
 .height-9[![](r/img/cb-behavior.3.svg)]
 ]
 
-???
-
-* ネットワークの障害でリクエストが到達できなくなった
-* 相手のサービスが過負荷でリクエストを捌けなくなっている
-
 ---
 
 ## Circuit Breaker の動き
@@ -1037,10 +557,6 @@ Close と Open がややこしいので、解説しておきます
 .center.float.bottom-10[
 .height-9[![](r/img/cb-behavior.4.svg)]
 ]
-
-???
-
-(本文)
 
 ---
 
@@ -1052,10 +568,6 @@ Close と Open がややこしいので、解説しておきます
 .height-9[![](r/img/cb-behavior.5.svg)]
 ]
 
-???
-
-(本文)
-
 ---
 
 ## Circuit Breaker の動き
@@ -1065,10 +577,6 @@ Close と Open がややこしいので、解説しておきます
 .center.float.bottom-10[
 .height-9[![](r/img/cb-behavior.6.svg)]
 ]
-
-???
-
-(本文)
 
 ---
 
@@ -1081,10 +589,6 @@ Close と Open がややこしいので、解説しておきます
 .height-9[![](r/img/cb-behavior.7.svg)]
 ]
 
-???
-
-(本文)
-
 ---
 
 ## Circuit Breaker の動き
@@ -1095,10 +599,6 @@ Close と Open がややこしいので、解説しておきます
 .center.float.bottom-10[
 .height-9[![](r/img/cb-behavior.8.svg)]
 ]
-
-???
-
-(本文)
 
 ---
 
@@ -1111,10 +611,6 @@ Close と Open がややこしいので、解説しておきます
 .height-9[![](r/img/cb-behavior.9.svg)]
 ]
 
-???
-
-(本文)
-
 ---
 
 ## Circuit Breaker の動き
@@ -1124,10 +620,6 @@ Close と Open がややこしいので、解説しておきます
 .center.float.bottom-10[
 .height-9[![](r/img/cb-behavior.10.svg)]
 ]
-
-???
-
-このように、外部サービスに障害が起きているときに、タイムアウトを待たずに早くエラーの応答を返せるようになるというメリットがあるのですが、もう一つメリットがあります。
 
 ---
 
@@ -1139,9 +631,6 @@ Close と Open がややこしいので、解説しておきます
 .height-14[![](r/img/cascade_failure.1.svg)]
 ]
 
-???
-それは、障害の連鎖を食い止められるということです。
-
 ---
 
 ## 障害の連鎖を食い止める
@@ -1151,10 +640,6 @@ Close と Open がややこしいので、解説しておきます
 .float.left-20.bottom-0[
 .height-14[![](r/img/cascade_failure.2.svg)]
 ]
-
-???
-
-(本文)
 
 ---
 
@@ -1166,10 +651,6 @@ Close と Open がややこしいので、解説しておきます
 .height-14[![](r/img/cascade_failure.3.svg)]
 ]
 
-???
-
-(本文)
-
 ---
 
 ## 障害の連鎖を食い止める
@@ -1179,10 +660,6 @@ Close と Open がややこしいので、解説しておきます
 .float.left-20.bottom-0[
 .height-14[![](r/img/cascade_failure.4.svg)]
 ]
-
-???
-
-(本文)
 
 ---
 
@@ -1194,104 +671,19 @@ Circuit Breaker を使うことによって、この障害の連鎖を食い止�
 .height-14[![](r/img/cascade_failure.5.svg)]
 ]
 
-???
+---
 
-(本文)
+## Akka では
 
 ---
 
-## Lagom では
-
-* 外部へのリクエストは全て Circuit Breaker を通じて行う
-
-.center[
-![](r/img/cb-call.svg)
-]
-
-???
-Lagom では、
-
-(本文)
-
----
-
-## Lagom を使わずに実現する方法
+## Akka を使わずに実現する方法
 
 * [Netflix - Hystrix](https://github.com/Netflix/Hystrix) (Java)
-* [Akka - Circuit Breaker](http://doc.akka.io/docs/akka/current/common/circuitbreaker.html) (Java/Scala)
-
-???
-Lagom 以外で実現するには
-
-(本文)
 
 ---
 
 ## まとめ
-
-モノリシックなシステムを単純に分割するだけでは、可用性やパフォーマンスの問題を抱えることになる。
-
-Lagom のデザインはその問題を解決するための<br>参考になるかもしれない。
-
-???
-
-(本文)
-
----
-
-## まとめ
-
-各デザインが改善する非機能要件
-
-.small[
-|デザイン|高可用性|低レイテンシ|スケーラビリティ|
-|--|:--:|:--:|:--:|
-|非同期/ノンブロッキング|○|○|-|
-|Sharding |○|-|○|
-|Event Sourcing + CQRS |○|○|○|
-|Circuit Breaker |○|○|-|
-]
-
----
-
-## Lagom は使いものになるのか？(私見)
-
-* Javaのフレームワークとしては導入障壁は高い
-    * 実績
-        * 導入事例がまだ出てきていない
-        * バグを踏む可能性が高い
-    * 実装の難しさ
-        * 非同期や関数型のプログラミングパラダイム
-
---
-
-ただし、Reactive な設計の参考にはなる
-
----
-
-## リアクティブ・システム<br>コンサルティングサービス
-
-* Akka / Play / Scala / 本日ご紹介した設計パターン
-    * POC
-    * 設計レビュー
-    * コードレビュー
-    * システム構築
-
-.float.right-10.bottom-10[
-.width-13.with-border-frame[![](r/img/leaflet.png)]
-]
-
-.footnote[
-https://www.tis.jp/service_solution/goreactive/
-
-TIS は Lightbend 社の認定コンサルティングパートナーです
-]
-
-???
-
-リアクティブ・システムコンサルティングサービスを行っています。
-Akka, Play, Scala といったプロダクトや、本日ご紹介した設計パターンの
-POC をやってみたい。設計やコードのレビューをして欲しいという方がいらっしゃれば、是非ご相談ください。
 
 ---
 class: center, middle
@@ -1306,30 +698,12 @@ class: center, middle
 
 ## 参考資料
 
-* Lagom 公式ドキュメント: https://www.lightbend.com/lagom
 * [Reactive Microservices Architecture (O’Reilly)](http://www.oreilly.com/programming/free/reactive-microservices-architecture.html)
 * [マイクロサービスアーキテクチャ (O’Reilly)](https://www.oreilly.co.jp/books/9784873117607/)
 
 ## イラスト
 
 * いらすとや: http://www.irasutoya.com/
-
----
-exclude: true
-
-## デモ？
-
----
-exclude: true
-
-## ReadSide への遅延の理由
-
-* Timestamp ベースでイベントの順序を決める
-* EventProcessor が参照するDBにイベントが反映されるタイミングがまばら
-* 全イベントを拾えるようにあえて遅延させている
-* `cassandra-query-journal.eventual-consistency-delay = 10s`
-* とは言いつつ全イベントが拾えることを保証するものではない
-  * ネットワーク障害
 
 </textarea><!-----------------↑ slide content (markdown) ↑------------------->
 
