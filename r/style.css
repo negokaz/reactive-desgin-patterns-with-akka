@@ -2,7 +2,10 @@
 /* Container */
 /*************/
 @import url(http://fonts.googleapis.com/earlyaccess/notosansjp.css);
-@import url(fonts/mplus-1m/mplus-1m.css);
+@import url(light-theme/fonts/mplus-1m/mplus-1m.css);
+html {
+  font-size: 20px;
+}
 html.remark-container,
 body.remark-container {
   height: 100%;
@@ -48,7 +51,7 @@ body:fullscreen {
 }
 .remark-slide-scaler {
   background-color: transparent;
-  overflow: hidden;
+  overflow: auto;
   position: absolute;
   -webkit-transform-origin: top left;
   -moz-transform-origin: top left;
@@ -62,6 +65,7 @@ body:fullscreen {
   width: 100%;
   display: table;
   table-layout: fixed;
+  position: relative;
 }
 .remark-slide > .left {
   text-align: left;
@@ -86,17 +90,7 @@ body:fullscreen {
   background-position: center;
   background-repeat: no-repeat;
   display: table-cell;
-  font-size: 20px;
   padding: 1em 4em 1em 4em;
-}
-.remark-slide-content h1 {
-  font-size: 55px;
-}
-.remark-slide-content h2 {
-  font-size: 45px;
-}
-.remark-slide-content h3 {
-  font-size: 35px;
 }
 .remark-slide-content .left {
   display: block;
@@ -122,7 +116,7 @@ body:fullscreen {
   display: none;
 }
 .remark-code {
-  font-size: 18px;
+  font-size: smaller;
 }
 .remark-code-line {
   min-height: 1em;
@@ -479,7 +473,7 @@ body:fullscreen {
 }
 .with-twitter-icon {
   list-style: none;
-  padding-left: calc(2rem);
+  padding-left: calc(1.5rem + 0.5em);
   margin-left: 1rem;
 }
 .with-twitter-icon:before {
@@ -489,7 +483,7 @@ body:fullscreen {
   width: 1.5rem;
   height: 1.5rem;
   background-repeat: no-repeat;
-  background-image: url('img/twitter.svg');
+  background-image: url('light-theme/img/twitter.svg');
   background-position: center;
   position: relative;
   margin-left: -1.5rem;
@@ -503,7 +497,7 @@ body:fullscreen {
   width: 1.5rem;
   height: 1.5rem;
   background-repeat: no-repeat;
-  background-image: url('img/twitter.svg');
+  background-image: url('light-theme/img/twitter.svg');
   background-position: center;
   position: relative;
   margin-left: -1.5rem;
@@ -512,7 +506,7 @@ body:fullscreen {
 }
 .with-github-icon {
   list-style: none;
-  padding-left: calc(2rem);
+  padding-left: calc(1.5rem + 0.5em);
   margin-left: 1rem;
 }
 .with-github-icon:before {
@@ -522,7 +516,7 @@ body:fullscreen {
   width: 1.5rem;
   height: 1.5rem;
   background-repeat: no-repeat;
-  background-image: url('img/github.svg');
+  background-image: url('light-theme/img/github.svg');
   background-position: center;
   position: relative;
   margin-left: -1.5rem;
@@ -536,7 +530,7 @@ body:fullscreen {
   width: 1.5rem;
   height: 1.5rem;
   background-repeat: no-repeat;
-  background-image: url('img/github.svg');
+  background-image: url('light-theme/img/github.svg');
   background-position: center;
   position: relative;
   margin-left: -1.5rem;
@@ -546,7 +540,7 @@ body:fullscreen {
 .with-checkbox-on {
   display: block;
   list-style: none;
-  padding-left: calc(1.5rem);
+  padding-left: calc(1rem + 0.5em);
 }
 .with-checkbox-on:before {
   content: '';
@@ -555,7 +549,7 @@ body:fullscreen {
   width: 1rem;
   height: 1rem;
   background-repeat: no-repeat;
-  background-image: url('img/checkbox-on.svg');
+  background-image: url('light-theme/img/checkbox-on.svg');
   background-position: center;
   position: relative;
   margin-left: -1rem;
@@ -569,7 +563,7 @@ body:fullscreen {
   width: 1rem;
   height: 1rem;
   background-repeat: no-repeat;
-  background-image: url('img/checkbox-on.svg');
+  background-image: url('light-theme/img/checkbox-on.svg');
   background-position: center;
   position: relative;
   margin-left: -1rem;
@@ -579,7 +573,7 @@ body:fullscreen {
 .with-checkbox-off {
   display: block;
   list-style: none;
-  padding-left: calc(1.5rem);
+  padding-left: calc(1rem + 0.5em);
 }
 .with-checkbox-off:before {
   content: '';
@@ -588,7 +582,7 @@ body:fullscreen {
   width: 1rem;
   height: 1rem;
   background-repeat: no-repeat;
-  background-image: url('img/checkbox-off.svg');
+  background-image: url('light-theme/img/checkbox-off.svg');
   background-position: center;
   position: relative;
   margin-left: -1rem;
@@ -602,7 +596,7 @@ body:fullscreen {
   width: 1rem;
   height: 1rem;
   background-repeat: no-repeat;
-  background-image: url('img/checkbox-off.svg');
+  background-image: url('light-theme/img/checkbox-off.svg');
   background-position: center;
   position: relative;
   margin-left: -1rem;
@@ -612,7 +606,7 @@ body:fullscreen {
 .with-arrow {
   display: block;
   list-style: none;
-  padding-left: calc(1.5rem);
+  padding-left: calc(1rem + 0.5em);
 }
 .with-arrow:before {
   content: '';
@@ -621,7 +615,7 @@ body:fullscreen {
   width: 1rem;
   height: 1rem;
   background-repeat: no-repeat;
-  background-image: url('img/therefore.svg');
+  background-image: url('light-theme/img/therefore.svg');
   background-position: center;
   position: relative;
   margin-left: -1rem;
@@ -635,7 +629,7 @@ body:fullscreen {
   width: 1rem;
   height: 1rem;
   background-repeat: no-repeat;
-  background-image: url('img/therefore.svg');
+  background-image: url('light-theme/img/therefore.svg');
   background-position: center;
   position: relative;
   margin-left: -1rem;
@@ -650,7 +644,7 @@ body:fullscreen {
   content: "";
   z-index: 999;
   position: absolute;
-  background-image: url('img/cursor.png');
+  background-image: url('light-theme/img/cursor.png');
   background-size: 1.5rem 1.5rem;
   top: 50%;
   left: 50%;
@@ -665,7 +659,7 @@ body:fullscreen {
   content: "";
   z-index: 999;
   position: absolute;
-  background-image: url('img/cursor.png');
+  background-image: url('light-theme/img/cursor.png');
   background-size: 1.5rem 1.5rem;
   bottom: 0%;
   right: 50%;
@@ -680,7 +674,7 @@ body:fullscreen {
   content: "";
   z-index: 999;
   position: absolute;
-  background-image: url('img/arrow-to-bottom.svg');
+  background-image: url('light-theme/img/arrow-to-bottom.svg');
   background-size: 3.5rem 3.5rem;
   top: 80%;
   left: 50%;
@@ -2368,6 +2362,9 @@ img {
     top: 0 !important;
     left: 0 !important;
   }
+}
+.center {
+  justify-content: center;
 }
 .left-column {
   width: 49%;
@@ -5140,4 +5137,22 @@ hr {
 .with-code-annotation > p > * {
   border: 0.05rem solid rgba(255, 255, 255, 0.75);
   background-color: rgba(255, 255, 255, 0.73);
+}
+.copyright {
+  font-size: 0.4rem;
+  color: rgba(18, 179, 199, 0.6);
+}
+.footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 95%;
+  height: 1.5rem;
+  text-align: left;
+  vertical-align: middle;
+  padding-left: 0.5rem;
+}
+.footer p {
+  margin: 0;
+  padding: 0;
 }

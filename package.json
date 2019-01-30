@@ -1,13 +1,15 @@
 {
-  "name": "reactive-meetup-lagom",
+  "name": "reactive-meetup-in-osaka-2019",
   "version": "1.0.0",
   "dependencies": {
     "http-server": "^0.9.0"
   },
   "scripts": {
+    "build": "lessc --strict-imports --rewrite-urls=all r/style.less r/style.css",
     "start": "http-server -o -c-1"
   },
   "author": "",
   "devDependencies": {
+    "less": "^3.9.0"
   }
 }

@@ -1,4 +1,4 @@
-# Lagom で学ぶ Reactive Microservices Architecture
+# Akka を用いたリアクティブシステムの設計パターン
 
 ## 閲覧方法
 

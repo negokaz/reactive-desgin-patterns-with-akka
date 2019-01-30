@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Lagom で学ぶ Reactive Microservices Architecture</title>
+<title>Akka を用いたリアクティブシステムの設計パターン</title>
   <meta charset="utf-8">
   <link rel="shortcut icon" href="r/favicon.ico">
-  <link rel="stylesheet" type="text/css" href="r/light-theme/light-theme.css" />
-  <link rel="stylesheet" type="text/css" href="r/tis-theme/tis-theme.css" />
+  <link rel="stylesheet" type="text/css" href="r/style.css" />
   <style type="text/css">
+    body, html { width:100%; height: 100%; margin: 0; padding: 0; overflow: hidden; }
+    textarea#source { width: 100%; height: 100%; border: none; }
     .remark-code {
       font-size: 1rem;
     }
@@ -18,14 +19,14 @@
 layout: true
 
 .footer[
-.copyright[© 2016 TIS Inc.]
+.copyright[© 2019 TIS Inc.]
 ]
 
 ---
 class: center, middle
 
 .glass[
-# Lagom で学ぶ<br>Reactive<br>Microservices Architecture
+# Akka を用いた<br>リアクティブシステムの<br>設計パターン
 ]
 
 ???
@@ -37,7 +38,7 @@ Lagom で学ぶ Reactive Microservices Architecture というテーマで発表�
 ## 私は何者？
 
 * 根来 和輝 .small[Negoro Kazuki]
-* TIS株式会社 生産技術R＆D室
+* TIS株式会社 テクノロジー&エンジニアリング部
 * Reactive System に関する技術検証・コンサル
     * Lightbend Reactive Platform
         * Scala / Akka / Play framework
@@ -123,7 +124,7 @@ Lightbend Reactive Platform つまり Scala や Akka、Play といった技術�
 * MSAにすると **.big[分散システム]** になる
 
 .center[
-.height-12[![](r/img/computer_p2p.png)]
+.height-10[![](r/img/computer_p2p.png)]
 ]
 
 ???
