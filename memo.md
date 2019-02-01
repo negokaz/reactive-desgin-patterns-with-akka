@@ -57,3 +57,32 @@ https://hackmd.io/EwIwhmwCYCwBwFoAMcCsBGBMBmB2JCAnEgMwDGCApieaobugGxiXBA==
   * パフォーマンスを上げる
   * 同期コミュニケーションの強い結合をなくす
 * ServiceLocator
+
+パターン一覧
+
+- 非同期/ノンブロッキング
+    - レイテンシを小さくする
+    - but 過負荷
+    - 外部サービスの障害時にスレッドが大量に生成されるのを防ぐ
+- Timeout
+    - 外部サービスの障害時にリソースの枯渇を防ぐ
+- Circuit Breaker
+    - 外部サービスの障害を切り離す
+    - 復旧直後に外部サービスが過負荷になるのを防ぐ
+- Event Sourcing + CQRS
+    - （スケールが難しい）Update を分離して書き込みをスケールできるようにする
+    - Event Sourcing
+        - 書き込みをスケールアウトできるようにする
+        - but 集計がしんどい
+    - CQRS
+        - イベントを集計しやすくする
+        - but 結果整合
+- Sharding によるステートフルなアーキテクチャ
+    - 処理単位をスケールアウトできるようにする
+    - 最新の状態のスナップショットをメモリ上に持つ
+    - スナップショットは 1 箇所に限定されるため結果整合ではない
+    - 自動復旧
+    - but Split Brain
+
+まとめ
+
