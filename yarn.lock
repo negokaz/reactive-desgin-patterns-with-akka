@@ -350,6 +350,11 @@ ms@2.0.0:
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.0.0.tgz#5608aeadfc00be6c2901df5f9861788de0d597c8"
   integrity sha1-VgiurfwAvmwpAd9fmGF4jeDVl8g=
 
+mxgraph@^3.9.12:
+  version "3.9.12"
+  resolved "https://registry.yarnpkg.com/mxgraph/-/mxgraph-3.9.12.tgz#5a5f75a79ab7e934ab935ce6ccfa0cff5c0da948"
+  integrity sha512-fm15Ro1bc/d3T/qvrkOIPjdAgyaKuaE6+olMpu9QZOm3aHWimu+W+dGAusW8VGVmaF4VYII11a5sVNdLekRoEw==
+
 oauth-sign@~0.9.0:
   version "0.9.0"
   resolved "https://registry.yarnpkg.com/oauth-sign/-/oauth-sign-0.9.0.tgz#47a7b016baa68b5fa0ecf3dee08a85c679ac6455"
