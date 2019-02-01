@@ -33,11 +33,13 @@ class: center, middle
 
 ## 私は何者？
 
-* 根来 和輝 .small[Negoro Kazuki]
-* TIS株式会社 テクノロジー&エンジニアリング部
-* Reactive System に関する技術検証・コンサル
-    * Lightbend Reactive Platform
-        * Scala / Akka / Play framework
+- 根来 和輝 .small[Negoro Kazuki]
+- TIS株式会社
+    - テクノロジー開発部
+- ミッション
+    - 高可用システムを安価なインフラに構築できる仕組み
+- 課外活動
+    - Akka 実践バイブル
 
 .with-twitter-icon[[@negokaz](https://twitter.com/negokaz)] .with-github-icon[[negokaz](https://github.com/negokaz)]
 
@@ -90,7 +92,7 @@ class: center, middle
 * 応答に100msかかるAPIを5つ呼び出すと...
 
 .center[
-.width-23[![](r/img/api-call.blocking.svg)]
+.width-20[![](r/img/api-call.0.svg)]
 ]
 
 ---
@@ -100,7 +102,7 @@ class: center, middle
 * 応答に100msかかるAPIを5つ呼び出すと...
 
 .center[
-.width-23[![](r/img/api-call.non-blocking.svg)]
+.width-20[![](r/img/api-call.1.svg)]
 ]
 
 .float-bottom-5[
@@ -114,7 +116,7 @@ class: center, middle
 * 待っている間もスレッドを専有する
 
 .center[
-.width-22[![](r/img/thread.blocking.svg)]
+.width-20[![](r/img/thread.0.svg)]
 ]
 
 ---
@@ -124,7 +126,7 @@ class: center, middle
 * 待っている間は別のタスクを処理できる
 
 .center[
-.width-22[![](r/img/thread.non-blocking.svg)]
+.width-20[![](r/img/thread.1.svg)]
 ]
 
 ---
@@ -134,7 +136,7 @@ class: center, middle
 * 相手が応答しないとき大量のスレッドを消費する
 
 .center[
-.width-22[![](r/img/thread.fail-blocking.1.svg)]
+.width-20[![](r/img/thread-fail.0.svg)]
 ]
 
 ---
@@ -144,7 +146,7 @@ class: center, middle
 * 相手が応答しないとき大量のスレッドを消費する
 
 .center[
-.width-22[![](r/img/thread.fail-blocking.2.svg)]
+.width-20[![](r/img/thread-fail.1.svg)]
 ]
 
 ---
@@ -154,7 +156,7 @@ class: center, middle
 * 相手が応答しなくてもスレッドの消費を抑えられる
 
 .center[
-.width-22[![](r/img/thread.fail-non-blocking.svg)]
+.width-20[![](r/img/thread-fail.2.svg)]
 ]
 
 ---
@@ -304,7 +306,7 @@ responseSize.thenAccept(size -> doSomething(size));
 * もしも…
 ]
 
-.height-18[![](r/img/sharding-architecture.8.svg)]
+.height-18[![](r/img/sharding-architecture.7.svg)]
 
 ---
 
@@ -314,7 +316,7 @@ responseSize.thenAccept(size -> doSomething(size));
 * Node に障害が起きたら
 ]
 
-.height-18[![](r/img/sharding-architecture.9.svg)]
+.height-18[![](r/img/sharding-architecture.8.svg)]
 
 ---
 
@@ -324,7 +326,7 @@ responseSize.thenAccept(size -> doSomething(size));
 * 別のノードに Shard が移動 (復元) する
 ]
 
-.height-18[![](r/img/sharding-architecture.10.svg)]
+.height-18[![](r/img/sharding-architecture.9.svg)]
 
 ---
 
@@ -334,7 +336,7 @@ responseSize.thenAccept(size -> doSomething(size));
 * 新しいノードを追加すると
 ]
 
-.height-18[![](r/img/sharding-architecture.11.svg)]
+.height-18[![](r/img/sharding-architecture.10.svg)]
 
 ---
 
@@ -344,7 +346,7 @@ responseSize.thenAccept(size -> doSomething(size));
 * シャードが分散(リバランス)される
 ]
 
-.height-18[![](r/img/sharding-architecture.12.svg)]
+.height-18[![](r/img/sharding-architecture.11.svg)]
 
 ---
 
@@ -370,6 +372,12 @@ Lagom は .strong[Event Sourcing] と .strong[CQRS] による永続化のしく�
 --
 
 .as-underlay.without-margin[
+.height-13[![](r/img/event-sourcing.0.svg)]
+]
+
+--
+
+.as-underlay.without-margin[
 .height-13[![](r/img/event-sourcing.1.svg)]
 ]
 
@@ -389,12 +397,6 @@ Lagom は .strong[Event Sourcing] と .strong[CQRS] による永続化のしく�
 
 .as-underlay.without-margin[
 .height-13[![](r/img/event-sourcing.4.svg)]
-]
-
---
-
-.as-underlay.without-margin[
-.height-13[![](r/img/event-sourcing.5.svg)]
 ]
 
 ---
@@ -525,7 +527,7 @@ Lagom は .strong[Event Sourcing] と .strong[CQRS] による永続化のしく�
 *Close* のときは通信できる
 
 .center.float.bottom-10[
-.height-9[![](r/img/cb-behavior.1.svg)]
+.height-9[![](r/img/cb-behavior.0.svg)]
 ]
 
 ---
@@ -535,7 +537,7 @@ Lagom は .strong[Event Sourcing] と .strong[CQRS] による永続化のしく�
 外部のサービスに障害が起きて…
 
 .center.float.bottom-10[
-.height-9[![](r/img/cb-behavior.2.svg)]
+.height-9[![](r/img/cb-behavior.1.svg)]
 ]
 
 ---
@@ -545,7 +547,7 @@ Lagom は .strong[Event Sourcing] と .strong[CQRS] による永続化のしく�
 正しくレスポンスが受け取れなくなると *FailureCount* のカウントが始まる
 
 .center.float.bottom-10[
-.height-9[![](r/img/cb-behavior.3.svg)]
+.height-9[![](r/img/cb-behavior.2.svg)]
 ]
 
 ---
@@ -555,7 +557,7 @@ Lagom は .strong[Event Sourcing] と .strong[CQRS] による永続化のしく�
 外部サービスへリクエストするたびに *FailureCount* が増えて
 
 .center.float.bottom-10[
-.height-9[![](r/img/cb-behavior.4.svg)]
+.height-9[![](r/img/cb-behavior.3.svg)]
 ]
 
 ---
@@ -565,7 +567,7 @@ Lagom は .strong[Event Sourcing] と .strong[CQRS] による永続化のしく�
 増えて...
 
 .center.float.bottom-10[
-.height-9[![](r/img/cb-behavior.5.svg)]
+.height-9[![](r/img/cb-behavior.4.svg)]
 ]
 
 ---
@@ -575,7 +577,7 @@ Lagom は .strong[Event Sourcing] と .strong[CQRS] による永続化のしく�
 *FailureCount* のしきい値に達すると、*Open* になって
 
 .center.float.bottom-10[
-.height-9[![](r/img/cb-behavior.6.svg)]
+.height-9[![](r/img/cb-behavior.5.svg)]
 ]
 
 ---
@@ -586,7 +588,7 @@ Lagom は .strong[Event Sourcing] と .strong[CQRS] による永続化のしく�
 *Circuit Breaker* 自身がエラーの応答を返すようになる
 
 .center.float.bottom-10[
-.height-9[![](r/img/cb-behavior.7.svg)]
+.height-9[![](r/img/cb-behavior.6.svg)]
 ]
 
 ---
@@ -597,7 +599,7 @@ Lagom は .strong[Event Sourcing] と .strong[CQRS] による永続化のしく�
 一時的にリクエストを通すようになる
 
 .center.float.bottom-10[
-.height-9[![](r/img/cb-behavior.8.svg)]
+.height-9[![](r/img/cb-behavior.7.svg)]
 ]
 
 ---
@@ -608,7 +610,7 @@ Lagom は .strong[Event Sourcing] と .strong[CQRS] による永続化のしく�
 その時に外部サービスが正常に戻っていると
 
 .center.float.bottom-10[
-.height-9[![](r/img/cb-behavior.9.svg)]
+.height-9[![](r/img/cb-behavior.8.svg)]
 ]
 
 ---
@@ -618,7 +620,7 @@ Lagom は .strong[Event Sourcing] と .strong[CQRS] による永続化のしく�
 *Open* になり、リクエストを通すようになる
 
 .center.float.bottom-10[
-.height-9[![](r/img/cb-behavior.10.svg)]
+.height-9[![](r/img/cb-behavior.9.svg)]
 ]
 
 ---
@@ -628,7 +630,7 @@ Lagom は .strong[Event Sourcing] と .strong[CQRS] による永続化のしく�
 復数のサービスが連携してリクエストを処理している
 
 .float.left-20.bottom-0[
-.height-14[![](r/img/cascade_failure.1.svg)]
+.height-14[![](r/img/cascade_failure.0.svg)]
 ]
 
 ---
@@ -638,7 +640,7 @@ Lagom は .strong[Event Sourcing] と .strong[CQRS] による永続化のしく�
 あるサービスが何らかの障害で過負荷になって リクエストを処理できなくなった
 
 .float.left-20.bottom-0[
-.height-14[![](r/img/cascade_failure.2.svg)]
+.height-14[![](r/img/cascade_failure.1.svg)]
 ]
 
 ---
@@ -648,7 +650,7 @@ Lagom は .strong[Event Sourcing] と .strong[CQRS] による永続化のしく�
 そのサービスに依存するサービスにもリクエストが溜まり 負荷が高くなる
 
 .float.left-20.bottom-0[
-.height-14[![](r/img/cascade_failure.3.svg)]
+.height-14[![](r/img/cascade_failure.2.svg)]
 ]
 
 ---
@@ -658,7 +660,7 @@ Lagom は .strong[Event Sourcing] と .strong[CQRS] による永続化のしく�
 さらにそのサービスに依存するサービスにも... (ry
 
 .float.left-20.bottom-0[
-.height-14[![](r/img/cascade_failure.4.svg)]
+.height-14[![](r/img/cascade_failure.3.svg)]
 ]
 
 ---
@@ -668,7 +670,7 @@ Lagom は .strong[Event Sourcing] と .strong[CQRS] による永続化のしく�
 Circuit Breaker を使うことによって、この障害の連鎖を食い止めることができる
 
 .float.left-20.bottom-0[
-.height-14[![](r/img/cascade_failure.5.svg)]
+.height-14[![](r/img/cascade_failure.4.svg)]
 ]
 
 ---
