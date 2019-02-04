@@ -6,11 +6,16 @@
     "mxgraph": "^3.9.12"
   },
   "scripts": {
-    "build": "lessc --strict-imports --rewrite-urls=all r/style.less r/style.css",
+    "watch": "watch \"npm run build\" ./src",
+    "build": "run-s build:css build:svg",
+    "build:css": "lessc --strict-imports --rewrite-urls=all src/style.less r/style.css",
+    "build:svg": "ls src/img/*.xml | xargs -P4 -I% drawio-batch -f svg % r/img/",
     "start": "http-server -o -c-1"
   },
   "author": "",
   "devDependencies": {
-    "less": "^3.9.0"
+    "less": "^3.9.0",
+    "npm-run-all": "^4.1.5",
+    "watch": "^1.0.2"
   }
 }
