@@ -257,7 +257,9 @@ responseSize.thenAccept(size -> doSomething(size));
 * Entity は Shard というグループに分けられる
 ]
 
-.height-18[![](r/img/sharding-architecture.2.svg)]
+.center[
+.height-16[![](r/img/sharding-architecture.2.svg)]
+]
 
 ---
 
@@ -267,7 +269,9 @@ responseSize.thenAccept(size -> doSomething(size));
 * Shard は Node(サーバ) に配置される
 ]
 
-.height-18[![](r/img/sharding-architecture.3.svg)]
+.center[
+.height-16[![](r/img/sharding-architecture.3.svg)]
+]
 
 ---
 
@@ -277,7 +281,9 @@ responseSize.thenAccept(size -> doSomething(size));
 * Shard は Node ごとに ShardRegion というグループになる
 ]
 
-.height-18[![](r/img/sharding-architecture.4.svg)]
+.center[
+.height-16[![](r/img/sharding-architecture.4.svg)]
+]
 
 ---
 
@@ -287,7 +293,9 @@ responseSize.thenAccept(size -> doSomething(size));
 * 各 Entity を ID で識別できるようにしておくと
 ]
 
-.height-18[![](r/img/sharding-architecture.5.svg)]
+.center[
+.height-16[![](r/img/sharding-architecture.5.svg)]
+]
 
 ---
 
@@ -297,7 +305,9 @@ responseSize.thenAccept(size -> doSomething(size));
 * メッセージで ID を指定しておけば、どの ShardRegion に送ってもその ID を持つ Entity に届く
 ]
 
-.height-18[![](r/img/sharding-architecture.6.svg)]
+.center[
+.height-16[![](r/img/sharding-architecture.6.svg)]
+]
 
 ---
 
@@ -307,7 +317,9 @@ responseSize.thenAccept(size -> doSomething(size));
 * もしも…
 ]
 
-.height-18[![](r/img/sharding-architecture.7.svg)]
+.center[
+.height-16[![](r/img/sharding-architecture.7.svg)]
+]
 
 ---
 
@@ -317,7 +329,9 @@ responseSize.thenAccept(size -> doSomething(size));
 * Node に障害が起きたら
 ]
 
-.height-18[![](r/img/sharding-architecture.8.svg)]
+.center[
+.height-16[![](r/img/sharding-architecture.8.svg)]
+]
 
 ---
 
@@ -327,7 +341,9 @@ responseSize.thenAccept(size -> doSomething(size));
 * 別のノードに Shard が移動 (復元) する
 ]
 
-.height-18[![](r/img/sharding-architecture.9.svg)]
+.center[
+.height-16[![](r/img/sharding-architecture.9.svg)]
+]
 
 ---
 
@@ -337,7 +353,9 @@ responseSize.thenAccept(size -> doSomething(size));
 * 新しいノードを追加すると
 ]
 
-.height-18[![](r/img/sharding-architecture.10.svg)]
+.center[
+.height-16[![](r/img/sharding-architecture.10.svg)]
+]
 
 ---
 
@@ -347,7 +365,9 @@ responseSize.thenAccept(size -> doSomething(size));
 * シャードが分散(リバランス)される
 ]
 
-.height-18[![](r/img/sharding-architecture.11.svg)]
+.center[
+.height-16[![](r/img/sharding-architecture.11.svg)]
+]
 
 ---
 
