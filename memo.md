@@ -70,7 +70,7 @@ https://hackmd.io/EwIwhmwCYCwBwFoAMcCsBGBMBmB2JCAnEgMwDGCApieaobugGxiXBA==
     - 外部サービスの障害を切り離す
     - 復旧直後に外部サービスが過負荷になるのを防ぐ
 - Event Sourcing + CQRS
-    - （スケールが難しい）Update を分離して書き込みをスケールできるようにする
+    - （スケールが難しい）Update を廃して書き込みをスケールできるようにする
     - Event Sourcing
         - 書き込みをスケールアウトできるようにする
         - but 集計がしんどい

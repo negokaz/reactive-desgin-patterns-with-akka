@@ -38,7 +38,7 @@ class: center, middle
 - TIS株式会社
     - テクノロジー開発部
 - ミッション
-    - 高可用システムを安価なインフラに構築できる仕組み
+    - 高可用システムを安価なインフラで
 - 課外活動
     - Akka 実践バイブル
 
@@ -48,8 +48,8 @@ class: center, middle
 
 ## 今日話したいこと
 
-* リアクティブシステムの設計パターンについて
-* 特に Akka が得意とするパターンをピックアップ
+* リアクティブシステムの設計パターン
+* 特に Akka が得意なパターンをピックアップ
 
 ---
 
@@ -68,11 +68,9 @@ class: center, middle
 ## リアクティブシステムの設計パターン
 
 - 非同期/ノンブロッキング
-- Timeout
 - Circuit Breaker
-- メッセージパッシング
 - バックプレッシャー
-- Sharding によるステートフルなアーキテクチャ
+- Sharding によるステートフルな負荷分散
 - Event Sourcing + CQRS
 
 ---
@@ -203,293 +201,26 @@ responseSize.thenAccept(size -> doSomething(size));
 
 ---
 
-## Akka を使わずに実現する方法
+## Akka では
+
+メッセージパッシングは本質的にノンブロッキング
+
+```scala
+pongActor ! Ping
+// 応答を待たずに次の作業へ
+```
+
+---
+
+## 注意点
+
+処理の最初から最後までノンブロッキング
 
 * HTTP
-  * [Play - WS API](https://www.playframework.com/documentation/2.5.x/ScalaWS) (Java/Scala)
-  * [Gigahorse](http://eed3si9n.com/gigahorse/) (Scala)
+  * [Netty](https://github.com/netty/netty) (Java)
 * DB
-  * [Java Driver for Apache Cassandra](https://github.com/datastax/java-driver)
+  * [Java Driver for Apache Cassandra](https://github.com/datastax/java-driver) (Java)
   * [postgresql-async & mysql-async](https://github.com/mauricio/postgresql-async) (Java)
-
----
-
-## Cluster Sharding
-
----
-
-## Sharding？
-
-* 負荷分散の手法の一つ
-* 単一障害点がないため高い可用性を実現できる
-* Lagomでは単体のサービスをスケールするのに利用される
-* **Entity** を分散させて負荷を分散する
-
----
-
-## Entity？
-
-* Entity がサービスの現在の状態を分散して持つ
-* 状態は オンメモリで管理され、<br>DB にバックアップされる
-* 状態を DB に問い合わせる必要がない
-    * レイテンシを抑えられる
-* Entity には*位置透過性*があり、ノード間を移動できる
-    * ノードやネットワークに障害があっても復旧できる
-
----
-
-## 例えば？
-
-* Lagom の公式サンプルアプリ [Chirper](https://github.com/lagom/activator-lagom-java-chirper) では<br>FriendEntity が実装されている
-* FriendEntity
-    * User ID ごとに作られる
-    * ユーザー名、フォローしているユーザーのリストを 状態として持つ
-
-.float.right-15.bottom-0[
-.height-8[![](r/img/jinmyaku.png)]
-]
-
----
-
-## Sharding？
-
-.float-top-15[
-* Entity は Shard というグループに分けられる
-]
-
-.center[
-.height-16[![](r/img/sharding-architecture.2.svg)]
-]
-
----
-
-## Sharding？
-
-.float-top-15[
-* Shard は Node(サーバ) に配置される
-]
-
-.center[
-.height-16[![](r/img/sharding-architecture.3.svg)]
-]
-
----
-
-## Sharding？
-
-.float-top-15[
-* Shard は Node ごとに ShardRegion というグループになる
-]
-
-.center[
-.height-16[![](r/img/sharding-architecture.4.svg)]
-]
-
----
-
-## Sharding？
-
-.float-top-15[
-* 各 Entity を ID で識別できるようにしておくと
-]
-
-.center[
-.height-16[![](r/img/sharding-architecture.5.svg)]
-]
-
----
-
-## Sharding？
-
-.float-top-15[
-* メッセージで ID を指定しておけば、どの ShardRegion に送ってもその ID を持つ Entity に届く
-]
-
-.center[
-.height-16[![](r/img/sharding-architecture.6.svg)]
-]
-
----
-
-## Sharding？
-
-.float-top-15[
-* もしも…
-]
-
-.center[
-.height-16[![](r/img/sharding-architecture.7.svg)]
-]
-
----
-
-## Sharding？
-
-.float-top-15[
-* Node に障害が起きたら
-]
-
-.center[
-.height-16[![](r/img/sharding-architecture.8.svg)]
-]
-
----
-
-## Sharding？
-
-.float-top-15[
-* 別のノードに Shard が移動 (復元) する
-]
-
-.center[
-.height-16[![](r/img/sharding-architecture.9.svg)]
-]
-
----
-
-## Sharding？
-
-.float-top-15[
-* 新しいノードを追加すると
-]
-
-.center[
-.height-16[![](r/img/sharding-architecture.10.svg)]
-]
-
----
-
-## Sharding？
-
-.float-top-15[
-* シャードが分散(リバランス)される
-]
-
-.center[
-.height-16[![](r/img/sharding-architecture.11.svg)]
-]
-
----
-
-## Akka を使わずに実現する方法
-
----
-
-## Event Sourcing + CQRS
-
----
-
-## 分散型の永続化機構
-
-Lagom は .strong[Event Sourcing] と .strong[CQRS] による永続化のしくみ<br>を備えており、データの読み込みと書き込みの両方を<br>スケールできるようになっている
-
----
-
-## Event Sourcing？
-
-* システムの中で起きた**イベント**を永続化する
-* イベントをデータストアに INSERT していく
-
---
-
-.as-underlay.without-margin[
-.height-13[![](r/img/event-sourcing.0.svg)]
-]
-
---
-
-.as-underlay.without-margin[
-.height-13[![](r/img/event-sourcing.1.svg)]
-]
-
---
-
-.as-underlay.without-margin[
-.height-13[![](r/img/event-sourcing.2.svg)]
-]
-
---
-
-.as-underlay.without-margin[
-.height-13[![](r/img/event-sourcing.3.svg)]
-]
-
---
-
-.as-underlay.without-margin[
-.height-13[![](r/img/event-sourcing.4.svg)]
-]
-
----
-
-## Event Sourcing？
-
-* Entity の状態が失われた場合は、<br>イベントを **再生** して状態を復元する
-* イベントは不変(immutable)
-    * ロック不要・複数のノードに分散して書き込める
-        * 書き込みをスケールしやすい
-    * キャッシュ・コピー・共有が容易
-        * 読み込みをスケールしやすい
-        * データの耐久性を高くできる
-
----
-
-## Event Sourcing？
-
-* デメリット
-  * データの集計にコストがかかる
-
---
-.with-arrow[**CQRS** で解決できる]
-
----
-
-## CQRS？
-
-* .bold[C]ommand and .bold[Q]uery .bold[R]esponsibility .bold[S]egregation
-    コマンドクエリ責務分離
-* コマンド(書き込み)とクエリ(読み込み)を分離する
-.center[
-.height-10[![](r/img/command-and-query.svg)]
-]
-
----
-
-## CQRS？
-
-.without-margin[
-.center[
-.height-8[![](r/img/command-and-query.svg)]
-]
-
-* 書き込み側と読み込み側で
-    * 異なるDB・データ構造が使える
-    * 別々にスケールできるようになる
-.with-arrow[Command-Side に Event Sourcing を使い<br>Query-Side に集計しやすい形で永続化する]
-]
-
----
-
-## CQRS？
-
-.center[
-.height-16[![](r/img/es-and-cqrs.svg)]
-]
-
----
-
-## CQRS？
-
-* デメリット
-    * 書き込み・読み込みで*完全な一貫性*を保てない
-      * 十分な時間が経つと整合性がとれる (結果整合性)
-.with-arrow[一時的に一貫性が取れてなくても問題ないよう ビジネスやシステムを設計する]
-* Entity をまたがる集計などを行うのに使える
-    * 例) その日の振込金額の合計
-
----
-
-## Akka を使わずに実現する方法
 
 ---
 
@@ -501,7 +232,7 @@ Lagom は .strong[Event Sourcing] と .strong[CQRS] による永続化のしく�
 
 外部サービスの障害時、即座にエラーの応答を返す仕組み
 * リトライによるネットワーク帯域の無駄遣いが減る
-* レイテンシを低く抑えられる
+* 障害時もレイテンシを低く抑えられる
 * 障害の連鎖を抑えることができる
 * **Close**・**Open**・**Half-Open** の状態をとる
 
@@ -703,6 +434,289 @@ Circuit Breaker を使うことによって、この障害の連鎖を食い止�
 ## Akka を使わずに実現する方法
 
 * [Netflix - Hystrix](https://github.com/Netflix/Hystrix) (Java)
+
+---
+
+## Event Sourcing + CQRS
+
+---
+
+## スケーラブルな永続化機構
+
+RDB を用いたシステムはレプリケーションによって<br>データの読み込みをスケールすることはできるが<br>書き込みをスケールさせることは難しい
+
+Akka は .strong[Event Sourcing] と .strong[CQRS] による永続化のしくみ<br>を提供しており、データの読み込みと書き込みの両方を<br>スケールさせやすくなっている
+
+---
+
+## Event Sourcing？
+
+* システムの中で起きた**イベント**を永続化する
+* イベントをデータストアに INSERT していく
+
+--
+
+.as-underlay.without-margin[
+.height-13[![](r/img/event-sourcing.0.svg)]
+]
+
+--
+
+.as-underlay.without-margin[
+.height-13[![](r/img/event-sourcing.1.svg)]
+]
+
+--
+
+.as-underlay.without-margin[
+.height-13[![](r/img/event-sourcing.2.svg)]
+]
+
+--
+
+.as-underlay.without-margin[
+.height-13[![](r/img/event-sourcing.3.svg)]
+]
+
+--
+
+.as-underlay.without-margin[
+.height-13[![](r/img/event-sourcing.4.svg)]
+]
+
+---
+
+## Event Sourcing のメリット
+
+**イベント**は不変（immutable）なので…
+
+* ロック不要・複数のノードに分散して書き込める
+    * 書き込みをスケールしやすい
+* キャッシュ・コピー・共有が容易
+    * 読み込みをスケールしやすい
+    * データの耐久性を高くできる
+
+---
+
+## Event Sourcing のデメリット
+
+* データの集計にコストがかかる
+.with-arrow[**CQRS** で解決できる]
+
+---
+
+## CQRS？
+
+* .bold[C]ommand and .bold[Q]uery .bold[R]esponsibility .bold[S]egregation
+    コマンドクエリ責務分離
+* コマンド(書き込み)とクエリ(読み込み)を分離する
+.center[
+.height-10[![](r/img/command-and-query.svg)]
+]
+
+---
+
+## CQRS のメリット
+
+.without-margin[
+.center[
+.height-8[![](r/img/command-and-query.svg)]
+]
+
+* 書き込み側と読み込み側で
+    * 異なるDB・データ構造が使える
+    * 別々にスケールできるようになる
+.with-arrow[Command-Side に Event Sourcing を使い<br>Query-Side に集計しやすい形で永続化する]
+]
+
+---
+
+## CQRS のデメリット
+
+読み込み側への反映は非同期に行うため…
+
+* 書き込み・読み込みで*完全な一貫性*を保てない    
+    * 十分な時間が経つと整合性がとれる*結果整合性*はある
+
+--
+
+.with-arrow[一時的に一貫性が取れてなくても問題ないよう ビジネスやシステムを設計する必要がある]
+
+---
+
+## それでも最新値が知りたいんや！
+
+---
+
+## CQRS？
+
+.center[
+.height-16[![](r/img/es-and-cqrs.svg)]
+]
+
+---
+
+## Akka を使わずに実現する方法
+
+---
+
+## Cluster Sharding
+
+---
+
+## Sharding？
+
+* 負荷分散の手法の一つ
+* 単一障害点がないため高い可用性を実現できる
+* **Entity** を分散させて負荷を分散する
+
+---
+
+## Entity？
+
+* Entity がサービスの**状態**を分散して持つ
+* 状態はオンメモリで管理され、DB にバックアップされる
+* 処理時に状態を DB に問い合わせる必要がない
+    * ⇒ レイテンシを抑えられる
+* Entity には**位置透過性**があり、ノード間を移動できる
+    * ⇒ ノードやネットワークに障害があっても復旧できる
+
+---
+
+## 例えば？
+
+* Lagom の公式サンプルアプリ [Chirper](https://github.com/lagom/activator-lagom-java-chirper) では<br>FriendEntity が実装されている
+* FriendEntity
+    * User ID ごとに作られる
+    * ユーザー名、フォローしているユーザーのリストを 状態として持つ
+
+.float.right-15.bottom-0[
+.height-8[![](r/img/jinmyaku.png)]
+]
+
+---
+
+## Sharding の機能
+
+.float-top-15[
+* Entity は Shard というグループに分けられる
+]
+
+.center[
+.height-16[![](r/img/sharding-architecture.2.svg)]
+]
+
+---
+
+## Sharding の機能
+
+.float-top-15[
+* Shard は Node(サーバ) に配置される
+]
+
+.center[
+.height-16[![](r/img/sharding-architecture.3.svg)]
+]
+
+---
+
+## Sharding の機能
+
+.float-top-15[
+* Shard は Node ごとに ShardRegion というグループになる
+]
+
+.center[
+.height-16[![](r/img/sharding-architecture.4.svg)]
+]
+
+---
+
+## Sharding の機能
+
+.float-top-15[
+* 各 Entity を ID で識別できるようにしておくと
+]
+
+.center[
+.height-16[![](r/img/sharding-architecture.5.svg)]
+]
+
+---
+
+## Sharding の機能
+
+.float-top-15[
+* メッセージで ID を指定しておけば、どの ShardRegion に送ってもその ID を持つ Entity に届く
+]
+
+.center[
+.height-16[![](r/img/sharding-architecture.6.svg)]
+]
+
+---
+
+## Sharding の機能
+
+.float-top-15[
+* もしも…
+]
+
+.center[
+.height-16[![](r/img/sharding-architecture.7.svg)]
+]
+
+---
+
+## Sharding の機能
+
+.float-top-15[
+* Node に障害が起きたら
+]
+
+.center[
+.height-16[![](r/img/sharding-architecture.8.svg)]
+]
+
+---
+
+## Sharding の機能
+
+.float-top-15[
+* 別のノードに Shard が移動 (復元) する
+]
+
+.center[
+.height-16[![](r/img/sharding-architecture.9.svg)]
+]
+
+---
+
+## Sharding の機能
+
+.float-top-15[
+* 新しいノードを追加すると
+]
+
+.center[
+.height-16[![](r/img/sharding-architecture.10.svg)]
+]
+
+---
+
+## Sharding の機能
+
+.float-top-15[
+* シャードが分散(リバランス)される
+]
+
+.center[
+.height-16[![](r/img/sharding-architecture.11.svg)]
+]
+
+---
+
+## Akka を使わずに実現する方法
 
 ---
 
