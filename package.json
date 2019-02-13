@@ -9,7 +9,7 @@
     "watch": "watch \"npm run build\" ./src",
     "build": "run-s build:css build:svg",
     "build:css": "lessc --strict-imports --rewrite-urls=all src/style.less r/style.css",
-    "build:svg": "drawio-batch -f svg -o r/img/ src/img/*.xml",
+    "build:svg": "bash -c 'drawio-batch -f svg -o r/img/ src/img/*.xml'",
     "start": "http-server -o -c-1"
   },
   "author": "",
