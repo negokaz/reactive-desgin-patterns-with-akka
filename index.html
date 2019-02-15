@@ -67,13 +67,15 @@ class: center, middle
 
 ## リアクティブシステムの設計パターン
 
+本日ご紹介するもの
+
 - 非同期/ノンブロッキング
 - Circuit Breaker
-- バックプレッシャー
-- Sharding によるステートフルな負荷分散
 - Event Sourcing + CQRS
+- Clsuter Sharding
 
 ---
+class: center, middle
 
 ## 非同期/ノンブロッキング
 
@@ -82,6 +84,7 @@ class: center, middle
 ## なぜ必要か？
 
 * レイテンシを小さくする
+* リソースを有効活用する
 * 外部サービスの障害時に影響を受けにくくする
 
 ---
@@ -164,12 +167,12 @@ class: center, middle
 
 * 同期/ブロッキング API
 
-```java
-Response b = serviceB.request();
-Response a = serviceA.request();
+```scala
+val a: Response = serviceB.request()
+val b: Response = serviceA.request()
 
-Integer responseSize = a.size + b.size;
-doSomething(responseSize);
+val responseSize: Int = a.size + b.size
+doSomething(responseSize)
 ```
 
 ---
@@ -178,14 +181,13 @@ doSomething(responseSize);
 
 * 非同期/ノンブロッキング API
 
-```java
-CompletionStage<Response> a = serviceA.request();
-CompletionStage<Response> b = serviceB.request();
+```scala
+val a: Future[Response] = serviceA.request();
+val b: Future[Response] = serviceB.request();
 
-CompletionStage<Integer> responseSize =
-  a.thenCombine(b,
-      (resA, resB) -> resA.size + resB.size));
-responseSize.thenAccept(size -> doSomething(size));
+val responseSize: Future[Int] = a.flatMap { 
+    resA => b.map(resB => resA.size + resB.size)
+  }
 ```
 
 .footnote[
@@ -223,6 +225,7 @@ pongActor ! Ping
   * [postgresql-async & mysql-async](https://github.com/mauricio/postgresql-async) (Java)
 
 ---
+class: center, middle
 
 ## Circuit Breaker
 
@@ -369,7 +372,7 @@ pongActor ! Ping
 
 ## Circuit Breaker の動き
 
-*Open* になり、リクエストを通すようになる
+*Close* になり、リクエストを通すようになる
 
 .center.float.bottom-10[
 .height-9[![](r/img/cb-behavior.9.svg)]
@@ -436,6 +439,7 @@ Circuit Breaker を使うことによって、この障害の連鎖を食い止�
 * [Netflix - Hystrix](https://github.com/Netflix/Hystrix) (Java)
 
 ---
+class: center, middle
 
 ## Event Sourcing + CQRS
 
@@ -536,7 +540,7 @@ Akka は .strong[Event Sourcing] と .strong[CQRS] による永続化のしく�
 読み込み側への反映は非同期に行うため…
 
 * 書き込み・読み込みで*完全な一貫性*を保てない    
-    * 十分な時間が経つと整合性がとれる*結果整合性*はある
+    * 十分に時間が経つと整合性がとれる*結果整合性*はある
 
 --
 
@@ -544,11 +548,49 @@ Akka は .strong[Event Sourcing] と .strong[CQRS] による永続化のしく�
 
 ---
 
-## それでも最新値が知りたいんや！
+## とは言え…
+
+銀行残高がマイナスにならないかチェックするなど
+
+**最新の状態**を取得したい場合もある
 
 ---
 
-## CQRS？
+## 最新の状態を求めて
+
+Akka Persistence を使うとイベントを永続化しつつ<br>（Actor の状態として）最新の状態のスナップショットを<br>インメモリに保持できる
+
+.as-underlay.without-margin[
+.height-13[![](r/img/event-sourcing.5.svg)]
+]
+
+---
+
+## コード例
+
+```scala
+var balance = 0 // 預金残高
+
+def receive = {
+  case Withdraw(amount) => // 引き出し依頼
+    if (balance < amount) {
+      sender() ! Error("預金残高不足")
+    } else {
+      balance = balance - amount
+      sender() ! Success
+    }
+```
+
+--
+
+.float-bottom-10.right-5.glass-deep[
+このように業務処理に関わる状態を<br>
+保持するアクターは **Entity** と呼ばれる
+]
+
+---
+
+## Akka による CQRS の実装パターン
 
 .center[
 .height-16[![](r/img/es-and-cqrs.svg)]
@@ -556,50 +598,56 @@ Akka は .strong[Event Sourcing] と .strong[CQRS] による永続化のしく�
 
 ---
 
-## Akka を使わずに実現する方法
+## 1台のサーバーでは捌けなくなったら…
+
+複数ある Entity を**複数のサーバー**に分散させたい
+
+ただし、Entity の状態の**一貫性**を保ったまま
 
 ---
+class: center, middle
 
 ## Cluster Sharding
 
 ---
 
-## Sharding？
+## Cluster Sharding？
 
-* 負荷分散の手法の一つ
+* 負荷分散のための仕組み
 * 単一障害点がないため高い可用性を実現できる
-* **Entity** を分散させて負荷を分散する
+* **Entity** を複数のサーバーに分散配置し負荷分散する
+* 各 Entity がクラスター内で高々 1 つだけ<br>存在することを保証させられる
+  * ⇒ 一貫性を保証できる
 
 ---
 
-## Entity？
+## Entity - おさらい
 
-* Entity がサービスの**状態**を分散して持つ
-* 状態はオンメモリで管理され、DB にバックアップされる
-* 処理時に状態を DB に問い合わせる必要がない
-    * ⇒ レイテンシを抑えられる
+* Entity（アクター）がシステムの**状態**を分散して持つ
+    * 例えば銀行口座ごと
+* イベントから状態が作り出される
+* 状態はオンメモリで管理される
 * Entity には**位置透過性**があり、ノード間を移動できる
     * ⇒ ノードやネットワークに障害があっても復旧できる
 
 ---
 
-## 例えば？
+## Cluster Sharding の機能
 
-* Lagom の公式サンプルアプリ [Chirper](https://github.com/lagom/activator-lagom-java-chirper) では<br>FriendEntity が実装されている
-* FriendEntity
-    * User ID ごとに作られる
-    * ユーザー名、フォローしているユーザーのリストを 状態として持つ
+.float-top-15[
+* Entity は **Shard** というグループに分けられる
+]
 
-.float.right-15.bottom-0[
-.height-8[![](r/img/jinmyaku.png)]
+.center[
+.height-16[![](r/img/sharding-architecture.1.svg)]
 ]
 
 ---
 
-## Sharding の機能
+## Cluster Sharding の機能
 
 .float-top-15[
-* Entity は Shard というグループに分けられる
+* Shard は **Node(サーバ)** に配置される
 ]
 
 .center[
@@ -608,10 +656,10 @@ Akka は .strong[Event Sourcing] と .strong[CQRS] による永続化のしく�
 
 ---
 
-## Sharding の機能
+## Cluster Sharding の機能
 
 .float-top-15[
-* Shard は Node(サーバ) に配置される
+* Shard は Node ごとに **ShardRegion** というグループになる
 ]
 
 .center[
@@ -620,10 +668,10 @@ Akka は .strong[Event Sourcing] と .strong[CQRS] による永続化のしく�
 
 ---
 
-## Sharding の機能
+## Cluster Sharding の機能
 
 .float-top-15[
-* Shard は Node ごとに ShardRegion というグループになる
+* 各 Entity は **ID** によって識別される
 ]
 
 .center[
@@ -632,10 +680,10 @@ Akka は .strong[Event Sourcing] と .strong[CQRS] による永続化のしく�
 
 ---
 
-## Sharding の機能
+## Cluster Sharding の機能
 
 .float-top-15[
-* 各 Entity を ID で識別できるようにしておくと
+* メッセージで ID を指定しておけば、どの ShardRegion に送ってもその ID を持つ Entity に届く
 ]
 
 .center[
@@ -644,19 +692,7 @@ Akka は .strong[Event Sourcing] と .strong[CQRS] による永続化のしく�
 
 ---
 
-## Sharding の機能
-
-.float-top-15[
-* メッセージで ID を指定しておけば、どの ShardRegion に送ってもその ID を持つ Entity に届く
-]
-
-.center[
-.height-16[![](r/img/sharding-architecture.6.svg)]
-]
-
----
-
-## Sharding の機能
+## Cluster Sharding の機能
 
 .float-top-15[
 * もしも…
@@ -668,7 +704,7 @@ Akka は .strong[Event Sourcing] と .strong[CQRS] による永続化のしく�
 
 ---
 
-## Sharding の機能
+## Cluster Sharding の機能
 
 .float-top-15[
 * Node に障害が起きたら
@@ -680,7 +716,7 @@ Akka は .strong[Event Sourcing] と .strong[CQRS] による永続化のしく�
 
 ---
 
-## Sharding の機能
+## Cluster Sharding の機能
 
 .float-top-15[
 * 別のノードに Shard が移動 (復元) する
@@ -692,7 +728,7 @@ Akka は .strong[Event Sourcing] と .strong[CQRS] による永続化のしく�
 
 ---
 
-## Sharding の機能
+## Cluster Sharding の機能
 
 .float-top-15[
 * 新しいノードを追加すると
@@ -704,7 +740,7 @@ Akka は .strong[Event Sourcing] と .strong[CQRS] による永続化のしく�
 
 ---
 
-## Sharding の機能
+## Cluster Sharding の機能
 
 .float-top-15[
 * シャードが分散(リバランス)される
@@ -716,11 +752,28 @@ Akka は .strong[Event Sourcing] と .strong[CQRS] による永続化のしく�
 
 ---
 
-## Akka を使わずに実現する方法
+## まとめ
+
+- 非同期/ノンブロッキング
+- Circuit Breaker
+- Event Sourcing + CQRS
+- Clsuter Sharding
 
 ---
 
-## まとめ
+## And more...
+
+.height-10[![](https://www.shoeisha.co.jp/static/splus/163/book/image/9784798153278.jpg)]
+
+.float-top-20.right-12[
+.with-checkbox-on[非同期/ノンブロッキング]
+.with-checkbox-off[Circuit Breaker]
+.with-checkbox-on[Event Sourcing + CQRS]
+.with-checkbox-on[Clsuter Sharding]
+.with-checkbox-on[ストリーム処理]
+.with-checkbox-on[システム間連携]
+.with-checkbox-on[...]
+]
 
 ---
 class: center, middle
