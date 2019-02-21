@@ -40,7 +40,7 @@ class: center, middle
 - ミッション
     - 高可用システムを安価なインフラで
 - 課外活動
-    - Akka 実践バイブル
+    - Akka 実践バイブル執筆
 
 .with-twitter-icon[[@negokaz](https://twitter.com/negokaz)] .with-github-icon[[negokaz](https://github.com/negokaz)]
 
@@ -60,7 +60,7 @@ class: center, middle
 ]
 
 .footnote[
-[リアクティブ・アーキテクチャ ～大規模サービスにおける必要性と課題〜](http://www.slideshare.net/okapies/reactive-architecture-20160218-58403521)
+出典：[リアクティブ・アーキテクチャ ～大規模サービスにおける必要性と課題〜](http://www.slideshare.net/okapies/reactive-architecture-20160218-58403521)
 ]
 
 ---
@@ -72,7 +72,7 @@ class: center, middle
 - 非同期/ノンブロッキング
 - Circuit Breaker
 - Event Sourcing + CQRS
-- Clsuter Sharding
+- Sharding
 
 ---
 class: center, middle
@@ -163,40 +163,35 @@ class: center, middle
 
 ---
 
-## 非同期/ノンブロッキング API の<br>デメリット
+## 非同期/ノンブロッキング API の問題点
 
 * 同期/ブロッキング API
 
 ```scala
-val a: Response = serviceB.request()
-val b: Response = serviceA.request()
+val a: Response = serviceB.requestSync()
+val b: Response = serviceA.requestSync()
 
-val responseSize: Int = a.size + b.size
-doSomething(responseSize)
+val responseTotalSize: Int = a.size + b.size
 ```
 
 ---
 
-## 非同期/ノンブロッキング API の<br>デメリット
+## 非同期/ノンブロッキング API の問題点
 
 * 非同期/ノンブロッキング API
 
 ```scala
-val a: Future[Response] = serviceA.request();
-val b: Future[Response] = serviceB.request();
+val a: Future[Response] = serviceA.requestAsync();
+val b: Future[Response] = serviceB.requestAsync();
 
-val responseSize: Future[Int] = a.flatMap { 
+val responseTotalSize: Future[Int] = a.flatMap { 
     resA => b.map(resB => resA.size + resB.size)
   }
 ```
 
-.footnote[
-[Java SE 8 API - CompletionStage&amp;lt;T&amp;gt;](https://docs.oracle.com/javase/jp/8/docs/api/java/util/concurrent/CompletionStage.html)
-]
-
 ---
 
-## 非同期/ノンブロッキング API の<br>デメリット
+## 非同期/ノンブロッキング API の問題点
 
 * 非同期 API の扱いに慣れるのに学習コストが必要
 * スレッドセーフな実装になるよう注意する必要がある
@@ -208,21 +203,45 @@ val responseSize: Future[Int] = a.flatMap {
 メッセージパッシングは本質的にノンブロッキング
 
 ```scala
-pongActor ! Ping
-// 応答を待たずに次の作業へ
+actor ! Message
+// 応答を待たずに次の処理へ
+```
+
+メッセージで
+
+- **リクエスト**（メソッド呼び出し）
+- **レスポンス**（戻り値）
+
+を表現する
+
+---
+
+## Akka では
+
+非同期処理であってもスレッドを（ほぼ）気にせず書ける
+
+```scala
+serviceA.requestAsync() pipeTo self
+serviceB.requestAsync() pipeTo self
+
+var responseTotalSize: Int = 0
+
+def receive = {
+  case resp: Response =>
+    responseTotalSize += resp.size
+}
 ```
 
 ---
 
-## 注意点
+## つまり
 
-処理の最初から最後までノンブロッキング
+学習コストは必要なものの、非同期処理特有の
 
-* HTTP
-  * [Netty](https://github.com/netty/netty) (Java)
-* DB
-  * [Java Driver for Apache Cassandra](https://github.com/datastax/java-driver) (Java)
-  * [postgresql-async & mysql-async](https://github.com/mauricio/postgresql-async) (Java)
+- 変数を更新するときに**更新が競合しないか**？
+- 値を参照するときに**古い値が見えないか**？
+
+といったことに（ほぼ）頭を抱えなくてよくなる
 
 ---
 class: center, middle
@@ -238,10 +257,6 @@ class: center, middle
 * 障害時もレイテンシを低く抑えられる
 * 障害の連鎖を抑えることができる
 * **Close**・**Open**・**Half-Open** の状態をとる
-
-.footnote[
-引用: [Lagom #Consuming services](http://www.lagomframework.com/documentation/1.2.x/java/ServiceClients.html#Circuit-Breakers)
-]
 
 ---
 
@@ -262,7 +277,7 @@ class: center, middle
 ## Circuit Breaker のしくみ
 
 .center.height-5[
-![](http://www.lagomframework.com/documentation/1.2.x/java/resources/guide/services/circuit-breaker-states.png)
+![](https://doc.akka.io/docs/akka/2.5/images/circuit-breaker-states.png)
 ]
 
 * **Close**: 外部サービスへリクエストする
@@ -272,7 +287,7 @@ class: center, middle
     * リクエストが成功したら Close に戻る
 
 .footnote[
-引用: [Lagom #Consuming services](http://www.lagomframework.com/documentation/1.2.x/java/ServiceClients.html#Circuit-Breakers)
+出典：[Circuit Breaker • Akka Documentation](https://doc.akka.io/docs/akka/2.5/common/circuitbreaker.html)
 ]
 
 ---
@@ -382,6 +397,7 @@ class: center, middle
 
 ## 障害の連鎖を食い止める
 
+マイクロサービスアーキテクチャで作られたシステムがあり、
 復数のサービスが連携してリクエストを処理している
 
 .float.left-20.bottom-0[
@@ -432,11 +448,33 @@ Circuit Breaker を使うことによって、この障害の連鎖を食い止�
 
 ## Akka では
 
+Circuit Breaker が標準で提供されている。
+
+- 失敗する可能性がある処理の呼び出しをラップする
+- **同期処理**、**非同期処理**の両方に対応
+- 指数関数的にリトライ間隔を増やす<br>**exponential backoff** が設定できる
+
+
+.footnote[
+[Circuit Breaker • Akka Documentation](https://doc.akka.io/docs/akka/2.5/common/circuitbreaker.html)
+]
+
 ---
 
-## Akka を使わずに実現する方法
+## コード例
 
-* [Netflix - Hystrix](https://github.com/Netflix/Hystrix) (Java)
+```scala
+val breaker = new CircuitBreaker(
+  system.scheduler,
+  // Open に状態遷移する失敗回数の閾値
+  maxFailures = 5,
+  // 処理のタイムアウト時間
+  callTimeout = 10.seconds,
+  // Open から Half-Open に遷移する時間
+  resetTimeout = 1.minute
+) // 非同期処理を行うメソッドを呼び出し
+breaker.withCircuitBreaker(dangerousAsyncCall)
+```
 
 ---
 class: center, middle
@@ -558,10 +596,10 @@ Akka は .strong[Event Sourcing] と .strong[CQRS] による永続化のしく�
 
 ## 最新の状態を求めて
 
-Akka Persistence を使うとイベントを永続化しつつ<br>（Actor の状態として）最新の状態のスナップショットを<br>インメモリに保持できる
+**Akka Persistence** を使うとイベントを永続化しつつ<br>（Actor の状態として）最新の状態のスナップショットを<br>インメモリに保持できる
 
 .as-underlay.without-margin[
-.height-13[![](r/img/event-sourcing.5.svg)]
+.height-12[![](r/img/event-sourcing.5.svg)]
 ]
 
 ---
@@ -600,24 +638,26 @@ def receive = {
 
 ## 1台のサーバーでは捌けなくなったら…
 
-複数ある Entity を**複数のサーバー**に分散させたい
+複数ある Entity を複数のサーバーで**分散処理**させたい
 
-ただし、Entity の状態の**一貫性**を保ったまま
+同じ口座の Entity が複数のサーバーにあると、インメモリにある口座残高の**一貫性**が崩れる可能性がある
+
+Entity の状態の一貫性を保ったまま負荷分散する方法は？
 
 ---
 class: center, middle
 
-## Cluster Sharding
+## Sharding
 
 ---
 
-## Cluster Sharding？
+## Sharding？
 
-* 負荷分散のための仕組み
-* 単一障害点がないため高い可用性を実現できる
+* **負荷分散**のための仕組み
+* 単一障害点がないため**高い可用性**を実現できる
 * **Entity** を複数のサーバーに分散配置し負荷分散する
-* 各 Entity がクラスター内で高々 1 つだけ<br>存在することを保証させられる
-  * ⇒ 一貫性を保証できる
+* 各 Entity がクラスター内で高々 1 つだけ<br>存在することを保証できる ⇒ **一貫性**を保証できる
+* Akka ではこれを実現するモジュールとして<br> **Cluster Sharding** という拡張機能を提供している
 
 ---
 
@@ -647,7 +687,7 @@ class: center, middle
 ## Cluster Sharding の機能
 
 .float-top-15[
-* Shard は **Node(サーバ)** に配置される
+* Shard は **Node(サーバー)** に配置される
 ]
 
 .center[
@@ -754,10 +794,18 @@ class: center, middle
 
 ## まとめ
 
-- 非同期/ノンブロッキング
-- Circuit Breaker
-- Event Sourcing + CQRS
-- Clsuter Sharding
+- *非同期/ノンブロッキング*
+  - リソース効率を上げ、障害による影響を少なくする
+- *Circuit Breaker*
+  - 障害を切り離し、障害に巻き込まれないようにする
+- *Event Sourcing + CQRS*
+  - データの読込と書込の両方をスケーラブルにする
+- *Sharding*
+  - 一貫性を保証しつつ負荷分散する
+
+--
+
+.with-arrow[Akka は各パターンの**実現をサポート**してくれる]
 
 ---
 
@@ -769,7 +817,7 @@ class: center, middle
 .with-checkbox-on[非同期/ノンブロッキング]
 .with-checkbox-off[Circuit Breaker]
 .with-checkbox-on[Event Sourcing + CQRS]
-.with-checkbox-on[Clsuter Sharding]
+.with-checkbox-on[Sharding]
 .with-checkbox-on[ストリーム処理]
 .with-checkbox-on[システム間連携]
 .with-checkbox-on[...]
@@ -788,8 +836,8 @@ class: center, middle
 
 ## 参考資料
 
-* [Reactive Microservices Architecture (O’Reilly)](http://www.oreilly.com/programming/free/reactive-microservices-architecture.html)
-* [マイクロサービスアーキテクチャ (O’Reilly)](https://www.oreilly.co.jp/books/9784873117607/)
+- [Akka実践バイブル アクターモデルによる並行・分散システムの実現](https://www.shoeisha.co.jp/book/detail/9784798153278)
+- [Reactive Microservices Architecture (O’Reilly)](http://www.oreilly.com/programming/free/reactive-microservices-architecture.html)
 
 ## イラスト
 
