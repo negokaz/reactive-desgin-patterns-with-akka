@@ -48,6 +48,11 @@ class: center, middle
 .height-8[![](https://www.shoeisha.co.jp/static/splus/163/book/image/9784798153278.jpg)]
 ]
 
+???
+
+高可用システムを安価なインフラで実現するという目標を掲げて
+Akka や Keepalived といった技術の検証を行っています。
+
 ---
 
 ## 今日話したいこと
@@ -91,6 +96,10 @@ class: center, middle
 * リソースを有効活用する
 * 外部サービスの障害時に影響を受けにくくする
 
+???
+
+なぜ「非同期/ノンブロッキング」というパターンがリアクティブシステムに必要なのでしょうか？
+
 ---
 
 ## 同期的にAPIを呼び出す
@@ -100,6 +109,16 @@ class: center, middle
 .center[
 .width-20[![](r/img/api-call.0.svg)]
 ]
+
+???
+
+詳しく見ていきましょう。
+
+とある API を実装することを考えてみます。
+この API の中では 5 つの外部 API を同期的に呼び出しています。
+それぞれの API は 100ms で応答を返します。
+
+このとき、全ての API を呼び出すのに合計で 500ms かかることになります。
 
 ---
 
@@ -111,9 +130,21 @@ class: center, middle
 .width-20[![](r/img/api-call.1.svg)]
 ]
 
+--
+
 .float-bottom-5[
 .with-arrow.glass[1/5 の時間で応答を返せる！]
 ]
+
+???
+
+では、外部 API の呼び出しを非同期にするとどうなるでしょうか。
+
+それぞれの外部 API に同時にリクエストを投げて、100ms 後にそれぞれの API から応答を受け取ります。
+
+-----
+
+つまり、1/5 の時間で応答を返せるようになるということです。
 
 ---
 
@@ -125,6 +156,17 @@ class: center, middle
 .width-20[![](r/img/thread.0.svg)]
 ]
 
+???
+
+次に、スレッドの動きを見ていきましょう。
+
+System A から System B にリクエストを送ることを考えます。
+System A は同期的に System B を同期的に呼び出しています。
+
+System B を呼び出した後、そのスレッドはレスポンスを待ち続けます。
+その間、そのスレッドでは他の処理ができません。
+つまり、スレッドがブロックしている状態になります。
+
 ---
 
 ## ノンブロッキングでタスクを実行する
@@ -134,6 +176,14 @@ class: center, middle
 .center[
 .width-20[![](r/img/thread.1.svg)]
 ]
+
+???
+
+非同期ノンブロッキングで処理をする場合はどうなるでしょうか。
+
+この場合は System B を呼び出したスレッドはリクエストに対するレスポンスを待たなくなります。
+つまり、レスポンスが返ってくるまでの間、他の処理ができます。
+これにより、より効率的にリソースを使えるようになります。
 
 ---
 
@@ -145,6 +195,14 @@ class: center, middle
 .width-20[![](r/img/thread-fail.0.svg)]
 ]
 
+???
+
+ノンブロッキングの利点はそれだけではありません。
+何らかの障害が起きて System B からの応答が受け取れなかったときのことを考えてみます。
+
+スレッドがブロックするようになっていると、応答が返ってこないのでずっとブロックすることになります。
+そうなると、新たに System B を呼び出す処理が呼ばれると、他のスレッドを使って呼び出す必要がでてきます。
+
 ---
 
 ## ブロックしてタスクを実行する
@@ -154,6 +212,12 @@ class: center, middle
 .center[
 .width-20[![](r/img/thread-fail.1.svg)]
 ]
+
+???
+
+こうやって、たくさん System B を呼び出す処理が呼ばれたとすると、このようにスレッドがどんどん消費されていきます。
+
+最終的にはメモリを食い潰してそのホストのパフォーマンスを劣化させます。
 
 ---
 
@@ -165,39 +229,56 @@ class: center, middle
 .width-20[![](r/img/thread-fail.2.svg)]
 ]
 
+???
+
+ノンブロッキングにしておくと、相手が応答しなかったとしても、スレッドがブロックしないので他の処理を実行でき、スレッドを大量に消費するといったことは起きません。
+
 ---
 
-## 非同期/ノンブロッキング API の問題点
+## 非同期/ノンブロッキング の問題点
 
-* 同期/ブロッキング API
+* 同期/ブロッキング
 
 ```scala
-val a: Response = serviceB.requestSync()
-val b: Response = serviceA.requestSync()
+val a: Response = systemA.requestSync()
+val b: Response = systemB.requestSync()
 
 val responseTotalSize: Int = a.size + b.size
 ```
 
+???
+
+ただ、非同期/ノンブロッキングに処理を行う場合は少し問題点があります。
+
+ここには同期的に処理するコードと非同期で処理するコードの例を書きました。
+両者では全く同じことをしています。
+
 ---
 
-## 非同期/ノンブロッキング API の問題点
+## 非同期/ノンブロッキング の問題点
 
-* 非同期/ノンブロッキング API
+* 非同期/ノンブロッキング
 
 ```scala
-val a: Future[Response] = serviceA.requestAsync();
-val b: Future[Response] = serviceB.requestAsync();
+val a: Future[Response] = systemA.requestAsync();
+val b: Future[Response] = systemB.requestAsync();
 
 val responseTotalSize: Future[Int] = a.flatMap { 
     resA => b.map(resB => resA.size + resB.size)
   }
 ```
 
+???
+
+これを見てわかるとおり、非同期に処理するコードは同期的に処理するコードと比べて若干複雑になります。
+
+また、複数の非同期処理からある変数を更新する場合など、スレッドセーフになっているか注意して実装する必要があります。
+
 ---
 
-## 非同期/ノンブロッキング API の問題点
+## 非同期/ノンブロッキング の問題点
 
-* 非同期 API の扱いに慣れるのに学習コストが必要
+* 非同期プログラミングに慣れるのに学習コストが必要
 * スレッドセーフな実装になるよう注意する必要がある
 
 ---
@@ -225,8 +306,8 @@ actor ! Message
 非同期処理であってもスレッドを（ほぼ）気にせず書ける
 
 ```scala
-serviceA.requestAsync() pipeTo self
-serviceB.requestAsync() pipeTo self
+systemA.requestAsync() pipeTo self
+systemB.requestAsync() pipeTo self
 
 var responseTotalSize: Int = 0
 
@@ -235,6 +316,10 @@ def receive = {
     responseTotalSize += resp.size
 }
 ```
+
+???
+
+ThreadLocal を使ったりスレッドに依存するライブラリを使ったりする場合は注意が必要
 
 ---
 
@@ -251,6 +336,10 @@ def receive = {
 class: center, middle
 
 ## Circuit Breaker
+
+???
+
+次に Circuit Breaker というパターンを見ていきます。
 
 ---
 
@@ -276,6 +365,12 @@ class: center, middle
 * **Close**: 回路が**閉じた**状態 = 通信できる
 * **Open**: 回路が**開いた**状態 = 通信が遮断されている
 
+???
+
+Close と Open がややこしいので、解説しておきます
+
+(本文)
+
 ---
 
 ## Circuit Breaker のしくみ
@@ -293,6 +388,12 @@ class: center, middle
 .footnote[
 出典：[Circuit Breaker • Akka Documentation](https://doc.akka.io/docs/akka/2.5/common/circuitbreaker.html)
 ]
+
+???
+
+システムの世界の Circuit Breaker はどのように振る舞うかというと、こうなります。
+
+(本文)
 
 ---
 
@@ -486,6 +587,10 @@ breaker.withCircuitBreaker(dangerousAsyncCall)
 class: center, middle
 
 ## Event Sourcing + CQRS
+
+???
+
+次に、Event Sourcing と CQRS というパターンを見ていきます。
 
 ---
 
