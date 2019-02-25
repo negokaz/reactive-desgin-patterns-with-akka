@@ -34,15 +34,19 @@ class: center, middle
 
 ## 私は何者？
 
-- 根来 和輝 .small[Negoro Kazuki]
-- TIS株式会社
+- *根来 和輝* .small[Negoro Kazuki]
+- *TIS株式会社*
     - テクノロジー開発部
-- ミッション
+- *ミッション*
     - 高可用システムを安価なインフラで
-- 課外活動
+- *課外活動*
     - Akka 実践バイブル執筆
 
 .with-twitter-icon[[@negokaz](https://twitter.com/negokaz)] .with-github-icon[[negokaz](https://github.com/negokaz)]
+
+.float-bottom-5.right-3[
+.height-8[![](https://www.shoeisha.co.jp/static/splus/163/book/image/9784798153278.jpg)]
+]
 
 ---
 
@@ -198,25 +202,25 @@ val responseTotalSize: Future[Int] = a.flatMap {
 
 ---
 
-## Akka では
+## Akka のメッセージパッシング
 
-メッセージパッシングは本質的にノンブロッキング
+**メッセージパッシング** は本質的にノンブロッキング
 
 ```scala
 actor ! Message
 // 応答を待たずに次の処理へ
 ```
 
-メッセージで
+**メッセージ** で
 
-- **リクエスト**（メソッド呼び出し）
-- **レスポンス**（戻り値）
+- リクエスト（≒ メソッド呼び出し）
+- レスポンス（≒ 戻り値）
 
 を表現する
 
 ---
 
-## Akka では
+## Akka のメッセージパッシング
 
 非同期処理であってもスレッドを（ほぼ）気にせず書ける
 
@@ -241,7 +245,7 @@ def receive = {
 - 変数を更新するときに**更新が競合しないか**？
 - 値を参照するときに**古い値が見えないか**？
 
-といったことに（ほぼ）頭を抱えなくてよくなる
+といったことに頭を抱えなくてよくなる
 
 ---
 class: center, middle
@@ -294,7 +298,7 @@ class: center, middle
 
 ## Circuit Breaker の動き
 
-*Close* のときは通信できる
+**Close** のときは通信できる
 
 .center.float.bottom-10[
 .height-9[![](r/img/cb-behavior.0.svg)]
@@ -314,7 +318,7 @@ class: center, middle
 
 ## Circuit Breaker の動き
 
-正しくレスポンスが受け取れなくなると *FailureCount* のカウントが始まる
+正しくレスポンスが受け取れなくなると **FailureCount** のカウントが始まる
 
 .center.float.bottom-10[
 .height-9[![](r/img/cb-behavior.2.svg)]
@@ -324,7 +328,7 @@ class: center, middle
 
 ## Circuit Breaker の動き
 
-外部サービスへリクエストするたびに *FailureCount* が増えて
+外部サービスへリクエストするたびに **FailureCount** が増えて
 
 .center.float.bottom-10[
 .height-9[![](r/img/cb-behavior.3.svg)]
@@ -344,7 +348,7 @@ class: center, middle
 
 ## Circuit Breaker の動き
 
-*FailureCount* のしきい値に達すると、*Open* になって
+**FailureCount** のしきい値に達すると、**Open** になって
 
 .center.float.bottom-10[
 .height-9[![](r/img/cb-behavior.5.svg)]
@@ -355,7 +359,7 @@ class: center, middle
 ## Circuit Breaker の動き
 
 リクエストを通さなくなり、<br>
-*Circuit Breaker* 自身がエラーの応答を返すようになる
+**Circuit Breaker 自身がエラーの応答**を返すようになる
 
 .center.float.bottom-10[
 .height-9[![](r/img/cb-behavior.6.svg)]
@@ -365,7 +369,7 @@ class: center, middle
 
 ## Circuit Breaker の動き
 
-ある一定時間が経つと、*Half-Open* になり
+ある一定時間が経つと、**Half-Open** になり
 一時的にリクエストを通すようになる
 
 .center.float.bottom-10[
@@ -387,7 +391,7 @@ class: center, middle
 
 ## Circuit Breaker の動き
 
-*Close* になり、リクエストを通すようになる
+**Close** になり、リクエストを通すようになる
 
 .center.float.bottom-10[
 .height-9[![](r/img/cb-behavior.9.svg)]
@@ -397,7 +401,7 @@ class: center, middle
 
 ## 障害の連鎖を食い止める
 
-マイクロサービスアーキテクチャで作られたシステムがあり、
+例）マイクロサービスなシステムがあり、
 復数のサービスが連携してリクエストを処理している
 
 .float.left-20.bottom-0[
@@ -408,7 +412,8 @@ class: center, middle
 
 ## 障害の連鎖を食い止める
 
-あるサービスが何らかの障害で過負荷になって リクエストを処理できなくなった
+あるサービスが何らかの障害で過負荷になり
+リクエストを処理できなくなった
 
 .float.left-20.bottom-0[
 .height-14[![](r/img/cascade_failure.1.svg)]
@@ -418,7 +423,8 @@ class: center, middle
 
 ## 障害の連鎖を食い止める
 
-そのサービスに依存するサービスにもリクエストが溜まり 負荷が高くなる
+そのサービスに依存するサービスに処理中のリクエストが
+滞留し、リクエストを処理できなくなる
 
 .float.left-20.bottom-0[
 .height-14[![](r/img/cascade_failure.2.svg)]
@@ -577,26 +583,25 @@ Akka は .strong[Event Sourcing] と .strong[CQRS] による永続化のしく�
 
 読み込み側への反映は非同期に行うため…
 
-* 書き込み・読み込みで*完全な一貫性*を保てない    
-    * 十分に時間が経つと整合性がとれる*結果整合性*はある
+* 書き込み・読み込みで**厳密な一貫性**を保てない    
+    * 十分に時間が経つと整合性がとれる**結果整合性**はある
 
 --
 
-.with-arrow[一時的に一貫性が取れてなくても問題ないよう ビジネスやシステムを設計する必要がある]
+.with-arrow[一時的に一貫性が取れていなくても問題ないように ビジネスやシステムを設計する必要がある]
 
 ---
 
 ## とは言え…
 
-銀行残高がマイナスにならないかチェックするなど
-
+銀行残高がマイナスにならないかをチェックするなど
 **最新の状態**を取得したい場合もある
 
 ---
 
 ## 最新の状態を求めて
 
-**Akka Persistence** を使うとイベントを永続化しつつ<br>（Actor の状態として）最新の状態のスナップショットを<br>インメモリに保持できる
+**Akka Persistence** を使うとイベントを永続化しつつ<br>（アクターの状態として）<br>最新の状態をインメモリに保持できる
 
 .as-underlay.without-margin[
 .height-12[![](r/img/event-sourcing.5.svg)]
@@ -656,7 +661,7 @@ class: center, middle
 * **負荷分散**のための仕組み
 * 単一障害点がないため**高い可用性**を実現できる
 * **Entity** を複数のサーバーに分散配置し負荷分散する
-* 各 Entity がクラスター内で高々 1 つだけ<br>存在することを保証できる ⇒ **一貫性**を保証できる
+* 各 Entity がクラスター内で高々 1 つだけ<br>存在することを保証できる ⇒ **一貫性を保証**できる
 * Akka ではこれを実現するモジュールとして<br> **Cluster Sharding** という拡張機能を提供している
 
 ---
@@ -665,10 +670,11 @@ class: center, middle
 
 * Entity（アクター）がシステムの**状態**を分散して持つ
     * 例えば銀行口座ごと
-* イベントから状態が作り出される
+* イベントから Entity の状態が作り出される
 * 状態はオンメモリで管理される
-* Entity には**位置透過性**があり、ノード間を移動できる
-    * ⇒ ノードやネットワークに障害があっても復旧できる
+* DB に保存されたイベントから状態を復旧できる
+    * ⇒ ノードに障害があっても Entity を復旧できる
+    * ⇒ Entity のノード間の移動も可能
 
 ---
 
