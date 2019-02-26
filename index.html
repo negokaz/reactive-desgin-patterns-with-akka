@@ -60,17 +60,30 @@ Akka や Keepalived といった技術の検証を行っています。
 * リアクティブシステムの設計パターン
 * 特に Akka が得意なパターンをピックアップ
 
+???
+
+今日はリアクティブシステムを実現するための設計パターンをいくつかご紹介したいと思います。
+リアクティブシステム自体はシステムを形容する言葉なので、その実現手段は様々あります。
+
+なので今日は特に Akka が得意とするパターンをピックアップしてご紹介します。
+
 ---
 
 ## リアクティブシステムのおさらい
 
+**メッセージ駆動**のアーキテクチャを基礎とし、**迅速かつ一貫した応答時間**でサービスが提供できるシステム。**障害**や**負荷の変動**に直面しても即応性を維持できる。
+
 .center[
-.with-border-frame.height-15[![](http://image.slidesharecdn.com/reactivearchitecture20160218-160218033020/95/devsumi-29-638.jpg?cb=1455774616)]
+.float-bottom-15.left-2.width-25[![](https://www.reactivemanifesto.org/images/reactive-traits-ja.svg)]
 ]
 
 .footnote[
-出典：[リアクティブ・アーキテクチャ ～大規模サービスにおける必要性と課題〜](http://www.slideshare.net/okapies/reactive-architecture-20160218-58403521)
+出典：リアクティブ宣言 https://www.reactivemanifesto.org/ja
 ]
+
+???
+
+はじめにリアクティブシステムのおさらいをしておきましょう。
 
 ---
 
@@ -83,10 +96,20 @@ Akka や Keepalived といった技術の検証を行っています。
 - Event Sourcing + CQRS
 - Sharding
 
+???
+
+とは言え、もう少し具体的にどういうアーキテクチャにすれば良いのかということが気になると思います。
+
+今日はリアクティブシステムを実現するための設計パターンのうち、この4つのパターンをご紹介します。
+
 ---
 class: center, middle
 
 ## 非同期/ノンブロッキング
+
+???
+
+１つ目は非同期/ノンブロッキングです。
 
 ---
 
@@ -94,11 +117,17 @@ class: center, middle
 
 * レイテンシを小さくする
 * リソースを有効活用する
-* 外部サービスの障害時に影響を受けにくくする
+* 外部システムの障害時に影響を受けにくくする
 
 ???
 
-なぜ「非同期/ノンブロッキング」というパターンがリアクティブシステムに必要なのでしょうか？
+なぜ「非同期/ノンブロッキング」というパターンがリアクティブシステムにとって必要なのでしょうか？
+
+このパターンを使うと（リスト）のような効果が期待できます。
+
+レイテンシを小さくし、リソースを有効活用できるようにすることで即応性を向上させることができます。
+
+外部システムの障害時に影響を受けにくくすることで耐障害性を向上させることができます。
 
 ---
 
@@ -130,6 +159,12 @@ class: center, middle
 .width-20[![](r/img/api-call.1.svg)]
 ]
 
+???
+
+では、外部 API の呼び出しを非同期にするとどうなるでしょうか。
+
+それぞれの外部 API に同時にリクエストを投げて、100ms 後にそれぞれの API から応答を受け取ります。
+
 --
 
 .float-bottom-5[
@@ -138,13 +173,7 @@ class: center, middle
 
 ???
 
-では、外部 API の呼び出しを非同期にするとどうなるでしょうか。
-
-それぞれの外部 API に同時にリクエストを投げて、100ms 後にそれぞれの API から応答を受け取ります。
-
------
-
-つまり、1/5 の時間で応答を返せるようになるということです。
+*つまり、1/5 の時間で応答を返せるようになります。*
 
 ---
 
@@ -285,7 +314,7 @@ val responseTotalSize: Future[Int] = a.flatMap {
 
 ## Akka のメッセージパッシング
 
-**メッセージパッシング** は本質的にノンブロッキング
+Akka の**メッセージパッシング**は非同期/ノンブロッキング
 
 ```scala
 actor ! Message
@@ -299,6 +328,11 @@ actor ! Message
 
 を表現する
 
+???
+
+Akka のメッセージパッシングはそれそのものが非同期/ノンブロッキングなので、
+非同期/ノンブロッキングを簡単に達成できます。
+
 ---
 
 ## Akka のメッセージパッシング
@@ -306,6 +340,7 @@ actor ! Message
 非同期処理であってもスレッドを（ほぼ）気にせず書ける
 
 ```scala
+// レスポンスをメッセージに変換
 systemA.requestAsync() pipeTo self
 systemB.requestAsync() pipeTo self
 
@@ -314,12 +349,23 @@ var responseTotalSize: Int = 0
 def receive = {
   case resp: Response =>
     responseTotalSize += resp.size
-}
 ```
 
 ???
 
-ThreadLocal を使ったりスレッドに依存するライブラリを使ったりする場合は注意が必要
+`receive` メソッドはシングルスレッドで実行される。
+
+ただ、メッセージ単位で使われるスレッドが入れ替わるため、ThreadLocal を使ったりスレッドに強く依存するライブラリを使ったりする場合は注意が必要
+
+--
+
+.float-bottom-10.right-6.glass-deep[
+※ 個々のアクターは**非同期**で動く
+]
+
+???
+
+*この状態でどこが非同期になるかというと、個々のアクターが非同期で動きます*
 
 ---
 
@@ -331,6 +377,34 @@ ThreadLocal を使ったりスレッドに依存するライブラリを使っ�
 - 値を参照するときに**古い値が見えないか**？
 
 といったことに頭を抱えなくてよくなる
+
+---
+
+## 補足
+
+メッセージパッシング（メッセージ駆動）には<br>
+`Future` のようなイベント駆動と比較して
+
+- スケールしやすい
+- リクエストの送信元から障害を隔離しやすい
+
+といったメリットがあると言われる。
+
+そのため、リアクティブ宣言のリアクティブシステムでは<br>
+「非同期/ノンブロッキング」をさらに一歩進めて<br>
+**メッセージ駆動**を基礎となる手段としている
+
+.footnote[
+[用語集 - リアクティブ宣言 #メッセージ駆動（イベント駆動と対比して）](https://www.reactivemanifesto.org/ja/glossary#Message-Driven)
+]
+
+???
+
+少し話が逸れますが、なぜリアクティブ宣言では「メッセージ駆動」がリアクティブシステムの実現手段になっているのかという話をします。
+
+メッセージパッシングには `Future` のようなイベント駆動型のプログラミングスタイルと比較して、スケールしやすかったり、リクエストの送信元から障害を隔離しやすいというメリットがあると言われています。
+
+そのため、リアクティブ宣言で言われるリアクティブシステムは「非同期/ノンブロッキング」をさらに一歩進めてメッセージ駆動を基礎となる手段としています。
 
 ---
 class: center, middle
@@ -404,6 +478,10 @@ Close と Open がややこしいので、解説しておきます
 .center.float.bottom-10[
 .height-9[![](r/img/cb-behavior.0.svg)]
 ]
+
+???
+
+もう少し具体的に見ていきます。
 
 ---
 
@@ -509,6 +587,10 @@ Close と Open がややこしいので、解説しておきます
 .height-14[![](r/img/cascade_failure.0.svg)]
 ]
 
+???
+
+「障害の連鎖を食い止める」という話を冒頭でしましたが、具体的にどういうことか見ていきます。
+
 ---
 
 ## 障害の連鎖を食い止める
@@ -566,6 +648,10 @@ Circuit Breaker が標準で提供されている。
 [Circuit Breaker • Akka Documentation](https://doc.akka.io/docs/akka/2.5/common/circuitbreaker.html)
 ]
 
+???
+
+Akka では Circuit Breaker が標準で提供されています。
+
 ---
 
 ## コード例
@@ -583,6 +669,10 @@ val breaker = new CircuitBreaker(
 breaker.withCircuitBreaker(dangerousAsyncCall)
 ```
 
+???
+
+使い方はこんな感じになります。
+
 ---
 class: center, middle
 
@@ -594,11 +684,17 @@ class: center, middle
 
 ---
 
-## スケーラブルな永続化機構
+## RDBMS の弱点
 
-RDB を用いたシステムはレプリケーションによって<br>データの読み込みをスケールすることはできるが<br>書き込みをスケールさせることは難しい
+RDBMS を用いたシステムはレプリケーションによって<br>データの読み込みをスケールすることはできるが<br>書き込みをスケールさせることは難しい
 
-Akka は .strong[Event Sourcing] と .strong[CQRS] による永続化のしくみ<br>を提供しており、データの読み込みと書き込みの両方を<br>スケールさせやすくなっている
+**Event Sourcing** と **CQRS** というパターンを<br>
+用いることによってデータの読み込みと書き込みの両方を<br>
+スケールさせやすくなる
+
+???
+
+アプリケーションのデータストアとしては RDBMS を用いることが多いと思いますが、そんな RDBMS には弱点があります。
 
 ---
 
@@ -606,6 +702,10 @@ Akka は .strong[Event Sourcing] と .strong[CQRS] による永続化のしく�
 
 * システムの中で起きた**イベント**を永続化する
 * イベントをデータストアに INSERT していく
+
+???
+
+イベントソーシングとは、
 
 --
 
@@ -653,7 +753,14 @@ Akka は .strong[Event Sourcing] と .strong[CQRS] による永続化のしく�
 
 ## Event Sourcing のデメリット
 
-* データの集計にコストがかかる
+データの集計にコストがかかる
+
+???
+
+ですが、Event Sourcing にはデメリットがあります。
+
+--
+
 .with-arrow[**CQRS** で解決できる]
 
 ---
@@ -666,6 +773,10 @@ Akka は .strong[Event Sourcing] と .strong[CQRS] による永続化のしく�
 .center[
 .height-10[![](r/img/command-and-query.svg)]
 ]
+
+???
+
+CQRS とは…
 
 ---
 
@@ -704,9 +815,9 @@ Akka は .strong[Event Sourcing] と .strong[CQRS] による永続化のしく�
 
 ---
 
-## 最新の状態を求めて
+## 最新の状態を得る方法
 
-**Akka Persistence** を使うとイベントを永続化しつつ<br>（アクターの状態として）<br>最新の状態をインメモリに保持できる
+**Akka Persistence** を使うとESスタイルでイベントを<br>永続化しつつ（アクターの状態として）最新の状態を<br>インメモリに保持できる
 
 .as-underlay.without-margin[
 .height-12[![](r/img/event-sourcing.5.svg)]
@@ -720,13 +831,13 @@ Akka は .strong[Event Sourcing] と .strong[CQRS] による永続化のしく�
 var balance = 0 // 預金残高
 
 def receive = {
-  case Withdraw(amount) => // 引き出し依頼
+  case cmd @ Withdraw(amount) => // 引き出し依頼
     if (balance < amount) {
       sender() ! Error("預金残高不足")
     } else {
-      balance = balance - amount
-      sender() ! Success
-    }
+      persist(cmd) { cmd => 
+        balance = balance - cmd.amount
+        sender() ! Success
 ```
 
 --
@@ -744,20 +855,33 @@ def receive = {
 .height-16[![](r/img/es-and-cqrs.svg)]
 ]
 
+???
+
+Akka を使って Event Sourcing + CQRS を実装した場合のアーキテクチャを俯瞰するとこのようになります。
+
 ---
 
 ## 1台のサーバーでは捌けなくなったら…
 
+アプリケーションサーバーの負荷が高くなったので
 複数ある Entity を複数のサーバーで**分散処理**させたい
 
 同じ口座の Entity が複数のサーバーにあると、インメモリにある口座残高の**一貫性**が崩れる可能性がある
 
 Entity の状態の一貫性を保ったまま負荷分散する方法は？
 
+???
+
+ですが、ここで新たな問題に直面します。
+
 ---
 class: center, middle
 
 ## Sharding
+
+???
+
+こういうときに登場するのが Sharding です。
 
 ---
 
@@ -768,6 +892,10 @@ class: center, middle
 * **Entity** を複数のサーバーに分散配置し負荷分散する
 * 各 Entity がクラスター内で高々 1 つだけ<br>存在することを保証できる ⇒ **一貫性を保証**できる
 * Akka ではこれを実現するモジュールとして<br> **Cluster Sharding** という拡張機能を提供している
+
+???
+
+Sharding とは…
 
 ---
 
@@ -792,6 +920,10 @@ class: center, middle
 .center[
 .height-16[![](r/img/sharding-architecture.1.svg)]
 ]
+
+???
+
+ここから Akka の Cluster Sharding の機能を図で説明します
 
 ---
 
@@ -906,17 +1038,25 @@ class: center, middle
 ## まとめ
 
 - *非同期/ノンブロッキング*
-  - リソース効率を上げ、障害による影響を少なくする
+  - 高速化、リソース効率UP、障害の影響を少なくする
 - *Circuit Breaker*
   - 障害を切り離し、障害に巻き込まれないようにする
 - *Event Sourcing + CQRS*
   - データの読込と書込の両方をスケーラブルにする
 - *Sharding*
-  - 一貫性を保証しつつ負荷分散する
+  - 一貫性を保証しつつ負荷分散。障害からの自動回復
+
+???
+
+本日のまとめです。
 
 --
 
 .with-arrow[Akka は各パターンの**実現をサポート**してくれる]
+
+???
+
+*Akka はこれらのパターンの実現をサポートしてくれます。*
 
 ---
 
@@ -934,6 +1074,16 @@ class: center, middle
 .with-checkbox-on[...]
 ]
 
+.footnote[
+出典：[Akka実践バイブル アクターモデルによる並行・分散システムの実現｜翔泳社の本](https://www.shoeisha.co.jp/book/detail/9784798153278)
+]
+
+???
+
+もっと学びたい方はこのような本があるのでご紹介しておきます。
+
+残念ながら 1 版には Circit Breaker の解説がありません。今日皆さんに買っていただけたら増版時に書きます！
+
 ---
 class: center, middle
 
@@ -949,6 +1099,7 @@ class: center, middle
 
 - [Akka実践バイブル アクターモデルによる並行・分散システムの実現](https://www.shoeisha.co.jp/book/detail/9784798153278)
 - [Reactive Microservices Architecture (O’Reilly)](http://www.oreilly.com/programming/free/reactive-microservices-architecture.html)
+- [Reactive Design Patterns（Manning）](https://www.manning.com/books/reactive-design-patterns)
 
 ## イラスト
 
