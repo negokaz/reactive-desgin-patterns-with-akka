@@ -2,8 +2,7 @@
   "name": "reactive-meetup-in-osaka-2019",
   "version": "1.0.0",
   "dependencies": {
-    "http-server": "^0.9.0",
-    "mxgraph": "^3.9.12"
+    "http-server": "^0.9.0"
   },
   "scripts": {
     "watch": "watch \"npm run build\" ./src",

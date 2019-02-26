@@ -13,7 +13,14 @@
 自動でブラウザが起動します。
 
 ```
-cd reactive-meetup-lagom
-npm install
-npm start
+yarn install
+yarn start
+```
+
+## ビルド
+
+CSS, SVG などのリソースを生成します。
+
+```
+yarn build
 ```
